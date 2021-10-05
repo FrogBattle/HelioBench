@@ -16,7 +16,7 @@
 
 ### 05 Oct 2021
 
-* *1 hour* Read the DeathStarBench publication and take notes.
+* *2 hours* Read the DeathStarBench publication and take notes.
 
 ## 04 Oct 2021
 
