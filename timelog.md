@@ -14,7 +14,14 @@
 
 ## Week 1
 
-### 05 Oct 2021
+### 07 Oct 2021
+
+* *1.5 hours* Skimmed the AIBench publication and took notes.
+* *1.5 hours* Read the Pattern based benchmarking publication and took notes.
+* *0.5 hours* Created and sent out meeting agenda for later today.
+* *0.5 hours* Had a meeting and send out action points.
+
+## 05 Oct 2021
 
 * *2 hours* Read the DeathStarBench publication and take notes.
 
