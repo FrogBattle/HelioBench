@@ -20,7 +20,7 @@
 * *1.5 hour* Read the Pattern based benchmarking publication and took notes.
 * *0.5 hour* Created and sent out meeting agenda for later today.
 * *0.5 hour* Had a meeting and send out action points.
-* *0.5 hour* Setting up and playing with DeathStarBench.
+* *1.5 hour* Setting up and playing with DeathStarBench.
 
 ## 05 Oct 2021
 
