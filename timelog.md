@@ -1,6 +1,6 @@
 # Timelog
 
-* PROJECT NAME
+* Microservices Benchmarking Suite
 * Alexander Simeonov
 * 2390362S
 * Yehia Elkhatib
@@ -14,7 +14,12 @@
 
 ## Week 1
 
-### 07 Oct 2021
+### 12 Oct 2021
+
+* *2.5 hour* Laid out basic project direction (objectives + methodologies) and documented them in Trello.
+* *1.5 hour* Started narrowing objectives and researching how to go about achieving them.
+
+## 07 Oct 2021
 
 * *1.5 hour* Skimmed the AIBench publication and took notes.
 * *1.5 hour* Read the Pattern based benchmarking publication and took notes.
