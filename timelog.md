@@ -14,7 +14,13 @@
 
 ## Week 1
 
-### 14 Oct 2021
+### 18 Oct 2021
+
+* *1.5 hour* Looked at installing and running the AIBench e-commerce scenario for integrating it into the suite.
+* *0.5 hour* Looked at the storyboard better, scheduled a quick adhoc meeting, and added questions for it.
+* *0.5 hour* Had an adhoc meeting, recorded notes.
+
+## 14 Oct 2021
 
 * *1.0 hour* Prepared better meeting agenda and made dissertation GitHub repo.
 * *1.0 hour* Started researching how to implement some AI app on MS architecture (DSB). AlexNet or AIBench app.
