@@ -14,7 +14,13 @@
 
 ## Week 1
 
-### 12 Oct 2021
+### 14 Oct 2021
+
+* *1.0 hour* Prepared better meeting agenda and made dissertation GitHub repo.
+* *1.0 hour* Started researching how to implement some AI app on MS architecture (DSB). AlexNet or AIBench app.
+* *0.5 hour* Had meeting and recorded notes + minutes
+
+## 12 Oct 2021
 
 * *2.5 hour* Laid out basic project direction (objectives + methodologies) and documented them in Trello.
 * *1.5 hour* Started narrowing objectives and researching how to go about achieving them.
