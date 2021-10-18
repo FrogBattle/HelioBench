@@ -19,6 +19,7 @@
 * *1.5 hour* Looked at installing and running the AIBench e-commerce scenario for integrating it into the suite.
 * *0.5 hour* Looked at the storyboard better, scheduled a quick adhoc meeting, and added questions for it.
 * *0.5 hour* Had an adhoc meeting, recorded notes.
+* *2.0 hours* Keep attempting to run all components of AIBench - resolving the issue with unavailable Git LFS files.
 
 ## 14 Oct 2021
 
