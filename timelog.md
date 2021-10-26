@@ -15,6 +15,10 @@
 ## Week 5
 
 ### 26 Oct 2021
+* *0.5 hour* Composed an email to AIBench's creators for GitHub LFS file transfer.
+* *0.5 hour* Rename repos + Trello, review notes, and update Methodology for the project on Trello.
+* *1 hour* Research into smaller benchmarking applications (workloads).
+* *1 hour* Research into AI-based benchmarking applications (workloads).
 
 ## Week 4
 
