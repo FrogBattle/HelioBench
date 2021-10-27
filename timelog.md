@@ -14,6 +14,10 @@
 
 ## Week 5
 
+### 27 Oct 2021
+* *1.5* Started containerising MicroSuite's ML app (HDSearch) in house as a submodule. Problem with enormous image building times ± an hour.
+* *1.5* Researched the area of AI-based microservice benchmarks and documented findings.
+
 ### 26 Oct 2021
 * *0.5 hour* Composed an email to AIBench's creators for GitHub LFS file transfer.
 * *0.5 hour* Rename repos + Trello, review notes, and update Methodology for the project on Trello.
