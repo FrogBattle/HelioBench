@@ -15,8 +15,14 @@
 ## Week 5
 
 ### 27 Oct 2021
-* *1.5* Started containerising MicroSuite's ML app (HDSearch) in house as a submodule. Problem with enormous image building times ± an hour.
-* *1.5* Researched the area of AI-based microservice benchmarks and documented findings.
+* *2 hours* Finished containerising MicroSuite's dependencies Dockerfile. 
+* *0.5 hour* Plan out meeting agenda points and questions.
+* *0.5 hour* Have regular supervisor meeting.
+* *1.0 hour* Look into taking the seq2seq MS from Fathom inhouse.
+
+### 27 Oct 2021
+* *1.5 hour* Started containerising MicroSuite's ML app (HDSearch) in house as a submodule. Problem with enormous image building times ± an hour.
+* *1.5 hour* Researched the area of AI-based microservice benchmarks and documented findings.
 
 ### 26 Oct 2021
 * *0.5 hour* Composed an email to AIBench's creators for GitHub LFS file transfer.
