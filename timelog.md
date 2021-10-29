@@ -14,7 +14,11 @@
 
 ## Week 5
 
-### 27 Oct 2021
+### 29 Oct 2021
+* *1.5 hours* Came up with a preliminary list of MSs to get in house. Sent to Yehia.
+* *1.5 hour* Attempting to setup a Fathom ML app (seq2seq) as a Docker container.
+
+### 28 Oct 2021
 * *2 hours* Finished containerising MicroSuite's dependencies Dockerfile. 
 * *0.5 hour* Plan out meeting agenda points and questions.
 * *0.5 hour* Have regular supervisor meeting.
