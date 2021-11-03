@@ -12,6 +12,12 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 6
+
+### 03 Nov 2021
+* *1.0 hour* Struggled with Fanthom's seq2seq and autoenc benchmarks - no success.
+* *1.0 hour* Struggled with MLPerf's recommender benchmark - no success so far. Seems better!
+
 ## Week 5
 
 ### 29 Oct 2021
