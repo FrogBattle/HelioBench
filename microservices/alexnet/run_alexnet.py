@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 import os
 import time
 
+# Divides the shuffling buffers, sacraficing shuffling perfection to reduce RAM load
+ALEXNET_BUFFER_SIZE_REDUCE_MODIFIER = int(os.getenv('ALEXNET_BUFFER_SIZE_REDUCE_MODIFIER', 4))
 
+# Smaller batches result in increased ETA but reduced RAM load
+ALEXNET_BATCH_SIZE = int(os.getenv('ALEXNET_BATCH_SIZE', 16))
 
 def process_images(image, label):
     # Normalize images to have a mean of 0 and standard deviation of 1
@@ -39,16 +43,16 @@ if __name__ == '__main__':
     print("Doing shuffling and batching")
     train_ds = (train_ds
                     .map(process_images)
-                    .shuffle(buffer_size=train_ds_size/4)
-                    .batch(batch_size=32, drop_remainder=True))
+                    .shuffle(buffer_size=train_ds_size/ALEXNET_BUFFER_SIZE_REDUCE_MODIFIER)
+                    .batch(batch_size=ALEXNET_BATCH_SIZE, drop_remainder=True))
     test_ds = (test_ds
                     .map(process_images)
-                    .shuffle(buffer_size=train_ds_size/4)
-                    .batch(batch_size=32, drop_remainder=True))
+                    .shuffle(buffer_size=train_ds_size/ALEXNET_BUFFER_SIZE_REDUCE_MODIFIER)
+                    .batch(batch_size=ALEXNET_BATCH_SIZE, drop_remainder=True))
     validation_ds = (validation_ds
                     .map(process_images)
-                    .shuffle(buffer_size=train_ds_size/4)
-                    .batch(batch_size=32, drop_remainder=True))
+                    .shuffle(buffer_size=train_ds_size/ALEXNET_BUFFER_SIZE_REDUCE_MODIFIER)
+                    .batch(batch_size=ALEXNET_BATCH_SIZE, drop_remainder=True))
 
     print("Defining the model")
     model = keras.models.Sequential([
