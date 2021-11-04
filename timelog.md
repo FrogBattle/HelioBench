@@ -14,6 +14,12 @@
 
 ## Week 6
 
+### 04 Nov 2021
+* *1.5 hour* Struggled with running MLPerf's recommender benchmark - no success. Realised it is too complex. Changed direction.
+* *1.5 hour* Found a tutorial for AlexNet with small dataset using Tensorflow. Dockerised it. Made a shell script to monitor.
+* *0.5 hour* Reviewing progress, coming up with meeting points, preparing for the incoming meeting.
+* *1.0 hour* Had meeting, reviewed and pushed notes, recorded APs, etc.
+
 ### 03 Nov 2021
 * *1.0 hour* Struggled with Fanthom's seq2seq and autoenc benchmarks - no success.
 * *1.0 hour* Struggled with MLPerf's recommender benchmark - no success so far. Seems better!
