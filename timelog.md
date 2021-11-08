@@ -12,6 +12,13 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 7
+
+### 08 Nov 2021
+* *0.5 hour* Send an email to Yehia about MoSCoW user stories (requirements) in Trello.
+* *1.5 hour* Get an nginx web application in store. Also create a workload service for it.
+* *2.0 hours* Create a Prometheus service to run on the benchmark. Create a docker compose for all services
+
 ## Week 6
 
 ### 04 Nov 2021
