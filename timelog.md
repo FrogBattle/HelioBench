@@ -19,6 +19,9 @@
 * *1.5 hour* Found a tutorial for AlexNet with small dataset using Tensorflow. Dockerised it. Made a shell script to monitor.
 * *0.5 hour* Reviewing progress, coming up with meeting points, preparing for the incoming meeting.
 * *1.0 hour* Had meeting, reviewed and pushed notes, recorded APs, etc.
+* ...
+* *1.5 hour* Struggling with different MLPerf workloads. Trying to go around Nvidia & Cuda. No success.
+* *1.0 hour* Reviewing AIBench's zenodo (repo with data). Realising they do NOT have all the data again (LFS placeholders still there). Sad.
 
 ### 03 Nov 2021
 * *1.0 hour* Struggled with Fanthom's seq2seq and autoenc benchmarks - no success.
