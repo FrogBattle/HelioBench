@@ -14,6 +14,10 @@
 
 ## Week 7
 
+### 10 Nov 2021
+* *1 hour* Poke around the Sock Shop Spring MSs to figure out a way to include a Spring API benchmark. Establish very high coupling between services and no way to mock inditividual Spring API service.
+* *1 hour* Look at the PetClinic MS app. The `/vets` endpoint seems quite standalone with all (generic) dependencies. Eg: service discovery, config server, vets service, prometheus. Some can be reduced to isolate better.
+
 ### 08 Nov 2021
 * *0.5 hour* Send an email to Yehia about MoSCoW user stories (requirements) in Trello.
 * *1.5 hour* Get an nginx web application in store. Also create a workload service for it.
