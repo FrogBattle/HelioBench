@@ -14,9 +14,14 @@
 
 ## Week 7
 
+### 1 Nov 2021
+* *1 hour* Review the requirements, high-level project plan, previous meeting minutes, include questions, progress and agenda for the meeting.
+* *1 hour* Try to decouple the PetClinic Spring MS from the whole application, surface problems, include in meeting agenda.
+* *0.5 hour* Have meeting with Yehia, gather meeting minutes and send to relevant repos.
+
 ### 10 Nov 2021
-* *1 hour* Poke around the Sock Shop Spring MSs to figure out a way to include a Spring API benchmark. Establish very high coupling between services and no way to mock inditividual Spring API service.
-* *1 hour* Look at the PetClinic MS app. The `/vets` endpoint seems quite standalone with all (generic) dependencies. Eg: service discovery, config server, vets service, prometheus. Some can be reduced to isolate better.
+* *1.0 hour* Poke around the Sock Shop Spring MSs to figure out a way to include a Spring API benchmark. Establish very high coupling between services and no way to mock inditividual Spring API service.
+* *1.0 hour* Look at the PetClinic MS app. The `/vets` endpoint seems quite standalone with all (generic) dependencies. Eg: service discovery, config server, vets service, prometheus. Some can be reduced to isolate better.
 
 ### 08 Nov 2021
 * *0.5 hour* Send an email to Yehia about MoSCoW user stories (requirements) in Trello.
@@ -30,7 +35,6 @@
 * *1.5 hour* Found a tutorial for AlexNet with small dataset using Tensorflow. Dockerised it. Made a shell script to monitor.
 * *0.5 hour* Reviewing progress, coming up with meeting points, preparing for the incoming meeting.
 * *1.0 hour* Had meeting, reviewed and pushed notes, recorded APs, etc.
-* ...
 * *1.5 hour* Struggling with different MLPerf workloads. Trying to go around Nvidia & Cuda. No success.
 * *1.0 hour* Reviewing AIBench's zenodo (repo with data). Realising they do NOT have all the data again (LFS placeholders still there). Sad.
 
