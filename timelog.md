@@ -14,7 +14,12 @@
 
 ## Week 7
 
-### 1 Nov 2021
+### 17 Nov 2021
+* *2 hours* Try to get on board with the PetClinic Spring API benchmark. Config service issues. Discovery service issues.
+* *1 hour* Try to get "microService" Spring API benchmark. Discovery service issues - server simply not starting. Built on top of SockShop images (Weaveworks).
+* *0.5 hour* Got small ML benchmark application. Runs too quickly and there are no larger datasets available. Representitiveness is questionable.
+
+### 11 Nov 2021
 * *1 hour* Review the requirements, high-level project plan, previous meeting minutes, include questions, progress and agenda for the meeting.
 * *1 hour* Try to decouple the PetClinic Spring MS from the whole application, surface problems, include in meeting agenda.
 * *0.5 hour* Have meeting with Yehia, gather meeting minutes and send to relevant repos.
