@@ -14,6 +14,11 @@
 
 ## Week 7
 
+### 18 Nov 2021
+* *1 hour* Start looking into Memcached and get the workload runner working.
+* *0.5 hour* Review last meeting notes and create a meeting agenda.
+* *0.5 hour* Have a supervisor meeting, upload relevant outcomes.
+
 ### 17 Nov 2021
 * *2 hours* Try to get on board with the PetClinic Spring API benchmark. Config service issues. Discovery service issues.
 * *1 hour* Try to get "microService" Spring API benchmark. Discovery service issues - server simply not starting. Built on top of SockShop images (Weaveworks).
