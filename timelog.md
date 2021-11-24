@@ -12,6 +12,14 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 8
+
+### 24 Nov 2021
+* *1.5 hour* Research MS application using Go services. Sock shop, Robot shop, Digota. High coupling and complexity.
+* *0.5 hour* Find a small example Go API and dockerize it.
+* *1.0 hour* Find an example locust runner, dockerize it, customise it to work with our app.
+* *0.5 hour* Implement prometheus and put the whole benchmark together.
+
 ## Week 7
 
 ### 18 Nov 2021
