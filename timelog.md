@@ -12,6 +12,15 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 9
+
+### 03 Dec 2021
+* *2.0 hours* Research ways Prometheus stores data. Consume web API vs TSDB connector.
+* *1.0 hour* Research basic raw metrics Prometheus scrapers give - CPU, MEM, IO.
+* *1.5 hours* Create an example web API consumption script which consumes Prometheus' API.
+* *0.5 hour* Prepare meeting agenda and bump timelogs.
+* *0.5 hour* Have the regular supervisor meeting.
+
 ## Week 8
 
 ### 24 Nov 2021
