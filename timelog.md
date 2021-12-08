@@ -12,6 +12,13 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 10
+
+### 08 Dec 2021
+* *0.5 hour* Download project template and transfer to Overleaf.
+* *1.0 hour* Start reading/watching on how to write - see sources in guides.
+* *0.5 hour* Start putting in preliminary sections. Finish tomorrow and give Yehia for review.
+
 ## Week 9
 
 ### 03 Dec 2021
