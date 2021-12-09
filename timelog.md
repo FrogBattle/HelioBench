@@ -14,6 +14,13 @@
 
 ## Week 10
 
+### 09 Dec 2021
+* *0.5 hour* Engage with more resources about how to write.
+* *1.0 hour* Expand some sections with high-level plan, put in questions, and action items for the dissertation. Send an email to Yehia, asking for feedback.
+* *1.0 hour* Research into starting and stopping (depending) containers consistently. Wait-for vs Dockerize. Leave for now.
+* *1.0 hour* Look into a native way to work with the TSDB from Promscale. Way too difficult. Allows for persistance & scaling, but not for our needs.
+* *1.0 hour* Create a recursive script to pull all data at the end of a given experiment. 
+
 ### 08 Dec 2021
 * *0.5 hour* Download project template and transfer to Overleaf.
 * *1.0 hour* Start reading/watching on how to write - see sources in guides.
