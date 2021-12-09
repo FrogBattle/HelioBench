@@ -10,11 +10,12 @@ services:
     build: ./go-load
     environment:
       - HOST=http://go-api:8080
-      - NUM_CLIENTS=30
-      - TIME=10h
+      - NUM_CLIENTS=3
+      - RUN_TIME=10m
     depends_on:
-      go-api:
-        condition: service_started
+      - go-api
+      - prometheus
+      - promscale
 
   prometheus:
     image: prom/prometheus:latest
@@ -26,5 +27,25 @@ services:
     volumes:
       - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
-      go-api:
-        condition: service_started
+      - go-api
+
+  promscale:
+    image: timescale/promscale:latest
+    ports:
+      - 9201:9201/tcp
+    restart: on-failure
+    depends_on:
+      - timescaledb
+      - prometheus
+    environment:
+      PROMSCALE_DB_CONNECT_RETRIES: 10
+      PROMSCALE_WEB_TELEMETRY_PATH: /metrics-text
+      PROMSCALE_DB_URI: postgres://postgres:password@timescaledb:5432/postgres?sslmode=allow
+
+  timescaledb:
+    image: timescaledev/timescaledb-ha:pg12-latest
+    ports:
+      - 5432:5432/tcp
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
