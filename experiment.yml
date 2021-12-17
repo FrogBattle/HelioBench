@@ -1,0 +1,10 @@
+services:
+  nginx-web:
+    environment:
+      - PROMETHEUS_PORT=9092
+  memcached:
+    environment:
+      - PROMETHEUS_PORT=9091
+  go-api:
+    environment:
+      - PROMETHEUS_PORT=9090

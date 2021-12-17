@@ -2,26 +2,39 @@ version: "3.9"
 services:
   memcached:
     build: ./memcached
+    environment:
+      - PROMETHEUS_TARGET_PORT=9101
     ports:
       - 11211:11211
-      - 9100:9100
+      - 9101:9101
 
   memaslap:
     build: ./memaslap
     depends_on:
       memcached:
         condition: service_started
-    entrypoint: ["./libmemcached-1.0.18/clients/memaslap", "--servers=memcached:11211" , "-t 2h", "-S 5s"]
+    environment:
+      - SERVERS=memcached:11211
+      - STAT_FREQ=10s
+      - TIME=1m
+      - EXPERIMENT_WORKLOAD=memcached
+    volumes:
+      - HelioBench:/home/experiment
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: memcached-prometheus
     ports:
-      - 9090:9090
+      - 9091:9091
     command:
       - --config.file=/etc/prometheus/prometheus.yml
+      - --web.listen-address=:9091
     volumes:
       - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       memcached:
         condition: service_started
+        
+volumes:
+  HelioBench:
+    external: true

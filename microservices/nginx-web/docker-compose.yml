@@ -5,7 +5,9 @@ services:
     hostname: nginx-web
     ports:
       - "80:80"
-      - "9100:9100"
+      - "9102:9102"
+    environment:
+      - PROMETHEUS_TARGET_PORT=9102
     restart: on-failure
 
   workgen-dev:
@@ -15,17 +17,28 @@ services:
       nginx-web:
         condition: service_started
     restart: on-failure
-    entrypoint: ["ab", "-n 1000000", "-c 10", "nginx-web:80/heaviest"]
+    environment:
+      - EXPERIMENT_WORKLOAD=nginx-web
+      - NUM_REQUESTS=200000
+      - NUM_CLIENTS=15
+    volumes:
+      - HelioBench:/home/experiment
+
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: nginx-prometheus
     ports:
-    - 9090:9090
+    - 9092:9092
     command:
     - --config.file=/etc/prometheus/prometheus.yml
+    - --web.listen-address=:9092
     volumes:
     - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       nginx-web:
         condition: service_started
+
+volumes:
+  HelioBench:
+    external: true

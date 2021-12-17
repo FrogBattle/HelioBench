@@ -2,7 +2,11 @@
 
 # Reference: https://github.com/instana/robot-shop/tree/master/load-gen
 
-# set -x
+
+### HelioBench: Experiment setup
+mkdir -p /home/experiment
+rm -f /home/experiment/finished/go-api.finish
+
 
 if [ -z "$HOST" ]
 then
@@ -45,3 +49,5 @@ else
     locust -f go-api.py --host "$HOST" --headless -r 1 -u $NUM_CLIENTS $TIME
 fi
 
+### HelioBench: Indicate experiment finish
+touch /home/experiment/go-api.finish

@@ -8,5 +8,8 @@ RUN wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.
 RUN cd libmemcached-1.0.18 && sed -i 's/LDFLAGS =/LDFLAGS = -L\/lib64 -lpthread/g' Makefile.in
 RUN cd libmemcached-1.0.18 && ./configure --enable-memaslap
 RUN cd libmemcached-1.0.18 && sudo make && sudo make install
- 
-CMD [ "./libmemcached-1.0.18/clients/memaslap", "-s 127.0.0.1:11211" , "-t 20s"]
+
+COPY entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
+
+CMD [ "./entrypoint.sh" ]
