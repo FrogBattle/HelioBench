@@ -12,6 +12,22 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 11
+
+### 17 Dec 2021
+* *2.0 hours* Start integrating the ```nginx-web``` benchmark. Bump upon Prometheus server issue (see [1](https://github.com/FrogBattle/HelioBench/issues/1)).
+* *1.0 hour* Create a config module for parsing an experiment configuration file.
+* *0.5 hour* Plan out and sit supervisor meeting.
+* *2.0 hours* Complete and submit status report.
+* *1.0 hour* Ensure the version with many Prometheus servers and a config file works for the three benchmarks in parallel.
+
+### 16 Dec 2021
+* *1.0 hour* Research how to work with volumes via auxiliary scripts in Docker-managed volumes. 
+* *1.0 hour* Create modules for working with such volumes and test it succeeds.
+* *3.0 hours* Plan and implement general orchestrator - subprocess for each benchmark.
+* *1.0 hour* Create the log- and metric-collection modules.
+* *1.0 hour* Integrate ```memcached``` as well as ```go-api``` and run them simultaneously.
+
 ## Week 10
 
 ### 09 Dec 2021
