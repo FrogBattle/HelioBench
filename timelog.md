@@ -12,6 +12,14 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 12
+
+### 03 Jan 2021
+* *0.5 hour* Get back to context after a long break and plan out the implementation of a unified Prometheus architecture.
+* *2.0 hours* Plan and implement a new configuration system. Includes environment variables injected into each service on startup, and a general ```environment``` section for global experiment options.
+* *3.0 hours* Implement a single Prometheus, linking to all benchmarks, available for logging. Includes all orchestrator functions.
+* *2.0 hours* Integrate the latest orchestrator into all services and ensure they all work correctly.
+
 ## Week 11
 
 ### 17 Dec 2021
