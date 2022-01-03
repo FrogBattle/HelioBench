@@ -3,10 +3,12 @@ services:
   memcached:
     build: ./memcached
     environment:
-      - PROMETHEUS_TARGET_PORT=9101
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
     ports:
       - 11211:11211
-      - 9101:9101
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    networks:
+      - HelioBench-network
 
   memaslap:
     build: ./memaslap
@@ -20,21 +22,13 @@ services:
       - EXPERIMENT_WORKLOAD=memcached
     volumes:
       - HelioBench:/home/experiment
+    networks:
+      - HelioBench-network
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: memcached-prometheus
-    ports:
-      - 9091:9091
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --web.listen-address=:9091
-    volumes:
-      - ${PWD}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    depends_on:
-      memcached:
-        condition: service_started
-        
 volumes:
   HelioBench:
+    external: true
+
+networks:
+  HelioBench-network:
     external: true

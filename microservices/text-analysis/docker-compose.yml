@@ -1,32 +1,18 @@
 version: "3.9"
 services:
-  nginx-web:
-    build: ./nginx
-    hostname: nginx-web
+  text-analysis:
+    build: .
+    hostname: text-analysis
     ports:
-      - "80:80"
       - "${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}"
     environment:
       - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+      - EXPERIMENT_WORKLOAD=text-analysis
     restart: on-failure
     networks:
       - HelioBench-network
-
-  workgen-dev:
-    build: ./workgen
-    hostname: workgen-dev
-    depends_on:
-      nginx-web:
-        condition: service_started
-    restart: on-failure
-    environment:
-      - EXPERIMENT_WORKLOAD=nginx-web
-      - NUM_REQUESTS=200000
-      - NUM_CLIENTS=15
     volumes:
       - HelioBench:/home/experiment
-    networks:
-      - HelioBench-network
 
 volumes:
   HelioBench:
