@@ -1,9 +1,10 @@
 import json
 import csv
 from json.decoder import JSONDecodeError
-from os import makedirs, path
+from os import environ, makedirs, path
 from time import  time, sleep
-from config_parser import parse_and_validate_config, parse_service_envvars
+from config_parser import PROMETHEUS_CONFIG_FILE_PATH, parse_and_validate_config, parse_config, parse_environment, parse_service_envvars, save_config
+from constants import EXPERIMENT_WORKLOAD, PROMETHEUS_PORT, PROMETHEUS_TARGET_PORT
 from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
 from asyncio.subprocess import PIPE
@@ -11,14 +12,21 @@ from subprocess import run as cmd_run
 from datetime import datetime
 
 DEFAULT_PROMETHEUS_PORT = '9900'
+DEFAULT_PROMETHEUS_TARGET_PORT = '9090'
+
+PROMETHEUS_FOLDER = '$(pwd)/microservices/prometheus/'
+PROMETHEUS_SERVER_NAME = 'helio-prometheus'
 
 LOCAL_SCRIPTS_FOLDER = '$(pwd)/scripts/'
 LOGS_FOLDER = './logs/'
 RESULTS_FOLDER = './results/'
+
 CONTAINER_SCRIPTS_FOLDER = '/home/scripts/'
 DOCKER_COMPOSE_COMMAND = 'docker-compose up --build'
+
 DOCKER_VOLUME_NAME = 'HelioBench'
 DOCKER_COMPOSE_VOLUME_PATH = f'/var/lib/docker/volumes/{DOCKER_VOLUME_NAME}/_data'
+
 QUERY_MAPPING = {
     'CPU_USER_PRC': "avg by (instance) (irate(node_cpu_seconds_total{mode='user'}[1m])) * 100",
     'CPU_SYS_PRC':  "avg by (instance) (irate(node_cpu_seconds_total{mode='system'}[1m])) * 100",
@@ -39,8 +47,7 @@ def run_auxiliary_script(script_name, parameters = '', text=False):
         python:3.9 python3 {CONTAINER_SCRIPTS_FOLDER}{script_name} {parameters}''',
         shell=True, capture_output=True, text=text)
 
-def collect_process_metrics_query(service_details, query, query_name):
-    prometheus_port = service_details['environment'].get('PROMETHEUS_PORT', DEFAULT_PROMETHEUS_PORT)
+def collect_process_metrics_query(prometheus_port, service_details, query, query_name):
     res = collect_metrics(prometheus_port, query, service_details['start_time'], service_details['end_time'], step=1)
 
     print(f'Collected {len(res)} datapoints for query: {query_name}')
@@ -60,15 +67,15 @@ def collect_process_metrics_query(service_details, query, query_name):
 
         writer.writerows(res)
 
-def collect_all_service_metrics(service_details):
-    print(f"Collecting metrics for {service_details['service']}")
+def collect_all_service_metrics(service_details, prometheus_port):
+    print(f"Collecting metrics for {service_details['service']}...")
     for query_name, query in QUERY_MAPPING.items():
-        collect_process_metrics_query(service_details, query, query_name)
+        collect_process_metrics_query(prometheus_port, service_details, query, query_name)
 
-async def run_benchmark(service):
+async def run_benchmark(service, env):
     process = await create_subprocess_shell(
         DOCKER_COMPOSE_COMMAND, cwd=f'./microservices/{service}',
-        stdout=PIPE, stderr=PIPE)
+        stdout=PIPE, stderr=PIPE, env=env)
     return process
 
 async def collect_logs(service, process):
@@ -92,13 +99,41 @@ async def collect_logs(service, process):
                 stderr_data_line = await process.stderr.readline()
                 file.write(stderr_data_line)
 
-async def orchestrate(services, service_envvars):
+def run_prometheus_server():
+    print("Starting Prometheus server...")
+    cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=None)
+    cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=None)
+
+def stop_prometheus_server():
+    print("Shutting down Prometheus server...")
+    cmd_run(f'docker container stop {PROMETHEUS_SERVER_NAME}', shell=True, stdout=None)
+    cmd_run(f'docker container rm {PROMETHEUS_SERVER_NAME}', shell=True, stdout=None)
+
+def prepare_prometheus_configuration(service_envvars):
+    print("Preparing Prometheus server configuration...")
+    prom_config = parse_config(PROMETHEUS_CONFIG_FILE_PATH)
+    prom_config['scrape_configs'][0]['static_configs'][0]['targets'] = [
+        f'{service_name}:{service_envvars.get(PROMETHEUS_TARGET_PORT, DEFAULT_PROMETHEUS_TARGET_PORT )}'
+         for service_name, service_envvars in service_envvars.items() if service_envvars is not None]
+    save_config(PROMETHEUS_CONFIG_FILE_PATH, prom_config)
+
+def export_service_envvars(service_envvars, service):
+    env = environ.copy()
+    if service_envvars[service] is not None:
+        env[EXPERIMENT_WORKLOAD] = service
+        for var_name, var_value in service_envvars[service].items():
+            env[var_name] = var_value
+    return env
+
+async def orchestrate(services, environment, service_envvars):
     experiment_start_time = time()
+    prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
+    
     try:
         processes = {}
         completed_processes = {}
         for service in services:
-            new_proc = await run_benchmark(service)
+            new_proc = await run_benchmark(service, export_service_envvars(service_envvars,service))
             processes[service] = {
                 "service":service, "process":new_proc, "start_time":time(),
                 "environment":service_envvars[service] if service in service_envvars else {}
@@ -108,7 +143,6 @@ async def orchestrate(services, service_envvars):
         sleep(5)
         while True:
             result = json.loads(run_auxiliary_script('poll_for_finish_files.py').stdout)
-
             duration = datetime.fromtimestamp(time() - experiment_start_time)
             print("Experiment running:", duration.strftime('%H:%M:%S'), end='\r')
 
@@ -119,7 +153,7 @@ async def orchestrate(services, service_envvars):
                     if finished_service_name in processes:
                         print(f"Service {finished_service_name} finished")
                         processes[finished_service_name]['end_time'] = time()
-                        collect_all_service_metrics(processes[finished_service_name])
+                        collect_all_service_metrics(processes[finished_service_name], prometheus_port)
                         processes[finished_service_name]['process'].terminate()
                         completed_processes[finished_service_name] = processes.pop(finished_service_name)
 
@@ -139,15 +173,20 @@ async def orchestrate(services, service_envvars):
     finally:
         print("Collecting logs for processes...")
         for service_details in [*processes.values(), *completed_processes.values()]:
-            await collect_logs(service_details['service'], service_details['process'])        
+            await collect_logs(service_details['service'], service_details['process'])
+
+        stop_prometheus_server()   
 
 async def main():
     config = parse_and_validate_config()
     services = list(config['services'].keys())
     service_envvars = parse_service_envvars(config)
-    print(service_envvars)
+    environment = parse_environment(config)
+    prepare_prometheus_configuration(service_envvars)
+
+    run_prometheus_server()
 
     print(run_auxiliary_script('remove_finished_volumes.py', ' '.join(services), True).stdout)
-    await orchestrate(services, service_envvars)
+    await orchestrate(services, environment, service_envvars)
 
 run(main())

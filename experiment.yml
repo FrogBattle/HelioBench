@@ -1,10 +1,20 @@
 services:
+  # alexnet:
+  #   variables:
+  #    - PROMETHEUS_TARGET_PORT=9104
+  text-analysis:
+    variables:
+     - PROMETHEUS_TARGET_PORT=9103
   nginx-web:
-    environment:
-      - PROMETHEUS_PORT=9092
+    variables:
+     - PROMETHEUS_TARGET_PORT=9102
   memcached:
-    environment:
-      - PROMETHEUS_PORT=9091
+    variables:
+     - PROMETHEUS_TARGET_PORT=9101
   go-api:
-    environment:
-      - PROMETHEUS_PORT=9090
+    variables:
+     - PROMETHEUS_TARGET_PORT=9100
+
+
+environment:
+  - PROMETHEUS_PORT=9090
