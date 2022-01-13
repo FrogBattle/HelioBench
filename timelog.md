@@ -12,7 +12,26 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
-## Week 12
+## Week 15
+
+### 13 Jan 2021
+* *0.5 hour* Update hours for the last several days.
+* *0.5 hour* Update kickoff meeting progress and agenda.
+* *0.5 hour* Have semester 2 kickoff meeting and record notes.
+
+### 11 Jan 2021
+* *1.5 hour* Go on expanding parts of the design section of the dissertation. 
+* *0.5 hour* Gather all questions I have and forward to Yehia in advance of the kickoff meeting.
+
+### 10 Jan 2021
+* *1.0 hour* Finalise introduction (motivation + main idea + contributions).
+* *1.5 hour* Plan out the rest of the design section and start expaning modules (easiest as I know what to write).
+
+## Week 14
+
+### 07 Jan 2021
+* *2.5 hours* Plan out better and write some of the dissertation introduction.
+* *1.0 hour* Look through all project documentation and start planning out the design section.
 
 ### 03 Jan 2021
 * *0.5 hour* Get back to context after a long break and plan out the implementation of a unified Prometheus architecture.
