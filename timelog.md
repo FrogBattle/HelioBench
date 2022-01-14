@@ -14,6 +14,10 @@
 
 ## Week 15
 
+### 14 Jan 2021
+* *1.5 hour* Expand last argument from the Benchmark section. Include experiment + graphs.
+* *1.5 hour* Finish expanding penultimate argument from the Benchmark section. Include tables and rationale.
+
 ### 13 Jan 2021
 * *0.5 hour* Update hours for the last several days.
 * *0.5 hour* Update kickoff meeting progress and agenda.
