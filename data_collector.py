@@ -19,8 +19,6 @@ class MetricCollectionError(Exception):
         return self.message
 
 def collect_metrics(prometheus_port, query, start_time = time() - ONE_DAY_IN_SECONDS, end_time = time(), step = 15):
-    query = "avg by (instance) (irate(node_cpu_seconds_total{mode='system'}[1m])) * 100"
-
     if start_time >= end_time:
         return []
     
