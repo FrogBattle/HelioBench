@@ -12,7 +12,23 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 16
+
+### 20 Jan 2021
+* *3.0 hours* Dockerize and deploy orchestrator instance. Automate login, image pushes, and deployment.
+* *Due to a GitHub/VSCode mistake, lost last 5 hours of code progress*
+* *0.5 hour* Plan for the meeting - progress, questions, agenda, etc.
+* *0.5 hour* Sit regular supervisor meeting.
+
+### 17 Jan 2021
+* *1.0 hour* Start implementing the designed architecture. 
+* *1.0 hour* Manually experiment with containers and deployments.
+
 ## Week 15
+
+### 15 Jan 2021
+* *2.0 hours* Research Azure services which would facilitate deployment.
+* *1.0 hour* Start planning an architecture for deployment via Azure Container Instances.
 
 ### 14 Jan 2021
 * *1.5 hour* Expand last argument from the Benchmark section. Include experiment + graphs.
