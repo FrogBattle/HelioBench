@@ -3,6 +3,7 @@ import yaml
 EXPERIMENT_CONFIG_FILE_PATH = "./experiment.yml"
 PROMETHEUS_CONFIG_FILE_PATH = "./microservices/prometheus/prometheus.yml"
 
+
 class ConfigError(Exception):
     def __init__(self, message="Error validating config"):
         self.message = message
@@ -16,6 +17,7 @@ def parse_config(config_path):
         except yaml.YAMLError as exc:
             print(exc)
 
+
 def save_config(config_path, config_object):
     with open(config_path, "w") as stream:
         try:
@@ -27,23 +29,28 @@ def save_config(config_path, config_object):
 def validate_config(config):
     if 'services' not in config or len(config['services']) <= 0:
         raise ConfigError("No experiment services specified.")
-    if type(config['services']) != type({}):
+    if not isinstance(config['services'], dict):
         raise ConfigError("Experiment services must be a dictionary.")
     for service_name, service in config['services'].items():
         if service is not None:
-            if type(service) != type({}):
-                raise ConfigError(f"Experiment service {service_name} must be a dictionary.")
+            if not isinstance(service, dict):
+                raise ConfigError(
+                    f"Experiment service {service_name} must be a dictionary.")
             if 'environment' in service:
-                if type(service['environment']) != type(list()):
-                    raise ConfigError(f"Environment of service {service_name} must be a list.")
-    
+                if not isinstance(service['environment'], list):
+                    raise ConfigError(
+                        f"Environment of service {service_name} must be a list.")
+
     return config
 
-def parse_and_validate_config(config_path = EXPERIMENT_CONFIG_FILE_PATH):
+
+def parse_and_validate_config(config_path=EXPERIMENT_CONFIG_FILE_PATH):
     return validate_config(parse_config(config_path))
 
-def parse_variables(variables):
-    return {envvar.split('=')[0]:envvar.split('=')[1] for envvar in variables}
+
+def parse_variables(variables, delimiter='='):
+    return {envvar.split(delimiter)[0]: delimiter.join(envvar.split(delimiter)[1:]) for envvar in variables}
+
 
 def parse_service_envvars(config):
     res = {}
@@ -55,11 +62,28 @@ def parse_service_envvars(config):
 
     return res
 
+
 def parse_environment(config):
     env = config.get('environment', None)
     if env is not None:
         env = parse_variables(env)
     return env
+
+
+def parse_azure(config):
+    env = config.get('azure', None)
+    if env is not None:
+        env = parse_variables(env)
+    return env
+
+
+def is_string_dockerfile_envvar(string):
+    if string.startswith('${') and string.endswith('}'):
+        truncated_string = string.replace('{', '').replace('}', '').replace('$', '')
+        if truncated_string.isupper():
+            return True, truncated_string
+    return False, None
+
 
 if __name__ == '__main__':
     print(parse_config('./experiment.yml'))

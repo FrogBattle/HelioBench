@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  go-api:
+    build: ./go-api
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+    ports:
+      - 8080:8080
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    networks:
+      - HelioBench-network
+
+  go-load:
+    build: ./go-load
+    environment:
+      - HOST=http://go-api:8080
+      - NUM_CLIENTS=3
+      - RUN_TIME=1m
+    depends_on:
+      - go-api
+      - promscale
+    volumes:
+      - HelioBench:/home/experiment
+    networks:
+      - HelioBench-network
+
+  promscale:
+    image: timescale/promscale:latest
+    ports:
+      - 9201:9201/tcp
+    restart: on-failure
+    depends_on:
+      - timescaledb
+    environment:
+      PROMSCALE_DB_CONNECT_RETRIES: 10
+      PROMSCALE_WEB_TELEMETRY_PATH: /metrics-text
+      PROMSCALE_DB_URI: postgres://postgres:password@timescaledb:5432/postgres?sslmode=allow
+    networks:
+      - HelioBench-network
+
+  timescaledb:
+    image: timescaledev/timescaledb-ha:pg12-latest
+    ports:
+      - 5432:5432/tcp
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+    networks:
+      - HelioBench-network
+
+volumes:
+  HelioBench:
+    external: true
+
+networks:
+  HelioBench-network:
+    external: true
