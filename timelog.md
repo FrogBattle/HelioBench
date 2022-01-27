@@ -15,7 +15,15 @@
 ## Week 17
 
 ### 27 Jan 2021
-* ...
+* *2.5 hours* Attempt to make building and pushing of images concurrent in deployment. Realise it is low priority, put in a task (#6) and go on.
+* *2.5 hours* Going on with deployment of multi-container instance groups. Blocker of wrongly implemented examples in Azure documentation stopped me for a while.
+* *0.5 hour* Prepare meeting agenda - notes, questions, progress.
+* *0.5 hour* Sit regular weekly supervisor meeting.
+* *2.0 hours* Resolve bug/uncertainty around Azure documentation and made multi-instance containers groups be successfully deployed now.
+* *2.0 hours* Force restarts when needed on deployment. Figure out several issues:
+  * Compose files/config is not parsed when individual images are built/pushed through their corresponding dockerfiles.
+  * Azure instances within a given container instance group share a host - this hurts representativeness. However, resources are allocated to individual instances and can be limited. 
+  * Logs will be hard to be implemented.
 
 ### 25 Jan 2021
 * *2.0 hours* Implement a shared Azure volume for management of finish files. 
