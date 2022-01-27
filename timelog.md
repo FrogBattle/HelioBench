@@ -12,6 +12,15 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 17
+
+### 27 Jan 2021
+* ...
+
+### 25 Jan 2021
+* *2.0 hours* Implement a shared Azure volume for management of finish files. 
+* *1.0 hour* Scaffold multi-container image pushing and deployment.
+
 ## Week 16
 
 ### 20 Jan 2021
@@ -19,6 +28,9 @@
 * *Due to a GitHub/VSCode mistake, lost last 5 hours of code progress*
 * *0.5 hour* Plan for the meeting - progress, questions, agenda, etc.
 * *0.5 hour* Sit regular supervisor meeting.
+* *3.0 hour* Make up on progress on automating HelioBench Azure deployment. Realise there is no need for an individual orchestrator instance - all can be done by the host.
+* *3.0 hours* Implement Prometheus image pushing and deployment. 
+* *1.0 hour* Add linting and virtual environment to the project for ease of use.
 
 ### 17 Jan 2021
 * *1.0 hour* Start implementing the designed architecture. 
