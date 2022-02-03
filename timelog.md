@@ -12,9 +12,14 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 18
+
+### 03 Feb 2022
+* *...*
+
 ## Week 17
 
-### 27 Jan 2021
+### 27 Jan 2022
 * *2.5 hours* Attempt to make building and pushing of images concurrent in deployment. Realise it is low priority, put in a task (#6) and go on.
 * *2.5 hours* Going on with deployment of multi-container instance groups. Blocker of wrongly implemented examples in Azure documentation stopped me for a while.
 * *0.5 hour* Prepare meeting agenda - notes, questions, progress.
@@ -25,13 +30,13 @@
   * Azure instances within a given container instance group share a host - this hurts representativeness. However, resources are allocated to individual instances and can be limited. 
   * Logs will be hard to be implemented.
 
-### 25 Jan 2021
+### 25 Jan 2022
 * *2.0 hours* Implement a shared Azure volume for management of finish files. 
 * *1.0 hour* Scaffold multi-container image pushing and deployment.
 
 ## Week 16
 
-### 20 Jan 2021
+### 20 Jan 2022
 * *3.0 hours* Dockerize and deploy orchestrator instance. Automate login, image pushes, and deployment.
 * *Due to a GitHub/VSCode mistake, lost last 5 hours of code progress*
 * *0.5 hour* Plan for the meeting - progress, questions, agenda, etc.
@@ -40,40 +45,40 @@
 * *3.0 hours* Implement Prometheus image pushing and deployment. 
 * *1.0 hour* Add linting and virtual environment to the project for ease of use.
 
-### 17 Jan 2021
+### 17 Jan 2022
 * *1.0 hour* Start implementing the designed architecture. 
 * *1.0 hour* Manually experiment with containers and deployments.
 
 ## Week 15
 
-### 15 Jan 2021
+### 15 Jan 2022
 * *2.0 hours* Research Azure services which would facilitate deployment.
 * *1.0 hour* Start planning an architecture for deployment via Azure Container Instances.
 
-### 14 Jan 2021
+### 14 Jan 2022
 * *1.5 hour* Expand last argument from the Benchmark section. Include experiment + graphs.
 * *1.5 hour* Finish expanding penultimate argument from the Benchmark section. Include tables and rationale.
 
-### 13 Jan 2021
+### 13 Jan 2022
 * *0.5 hour* Update hours for the last several days.
 * *0.5 hour* Update kickoff meeting progress and agenda.
 * *0.5 hour* Have semester 2 kickoff meeting and record notes.
 
-### 11 Jan 2021
+### 11 Jan 2022
 * *1.5 hour* Go on expanding parts of the design section of the dissertation. 
 * *0.5 hour* Gather all questions I have and forward to Yehia in advance of the kickoff meeting.
 
-### 10 Jan 2021
+### 10 Jan 2022
 * *1.0 hour* Finalise introduction (motivation + main idea + contributions).
 * *1.5 hour* Plan out the rest of the design section and start expaning modules (easiest as I know what to write).
 
 ## Week 14
 
-### 07 Jan 2021
+### 07 Jan 2022
 * *2.5 hours* Plan out better and write some of the dissertation introduction.
 * *1.0 hour* Look through all project documentation and start planning out the design section.
 
-### 03 Jan 2021
+### 03 Jan 2022
 * *0.5 hour* Get back to context after a long break and plan out the implementation of a unified Prometheus architecture.
 * *2.0 hours* Plan and implement a new configuration system. Includes environment variables injected into each service on startup, and a general ```environment``` section for global experiment options.
 * *3.0 hours* Implement a single Prometheus, linking to all benchmarks, available for logging. Includes all orchestrator functions.
