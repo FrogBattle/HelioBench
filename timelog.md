@@ -15,7 +15,16 @@
 ## Week 18
 
 ### 03 Feb 2022
-* *...*
+* *2.0 hours* Went on implementing deployment via Python SDK. Bumped onto an issue with the docker-compose context - contradicts the design of orchestration.
+* *3.0 hours* Went forward with the `docker compose` context and the ACI - Docker implementation.
+  * Changed docker-compose images to use configuration for deploying the ACIs
+  * Added envvar exporting and support for the images so configuration is unified in the `experiment.yml`
+  * Created support for different filename of the compose file. So the local context one is conventional.
+* *0.5 hour* Gather progress and meeting notes and plan out supervisor meeting.
+* *0.5 hour* Sit supervisor meeting and upload the notes.
+* *1.0 hour* Implement gathering of Prometheus metrics for deployment.
+* *1.0 hour* Implement finish file polling for deployment.
+* *1.0 hour* Finish end-to-end experiment deployment through the `docker compose` context. Err handling & Logs left.
 
 ## Week 17
 
