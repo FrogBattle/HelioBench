@@ -2,12 +2,12 @@
 FROM python:3.9
 
 # Some default values
-ENV HOST="http://localhost:8080/" \
+ENV GO_LOAD_TARGET_HOST="http://localhost:8080/" \
+    GO_LOAD_NUM_CLIENTS=1 \
+    GO_LOAD_RUN_TIME=0 \
     SILENT=0 \
-    NUM_CLIENTS=1 \
-    ERROR=0 \
-    RUN_TIME=0
-    
+    ERROR=0
+
 
 WORKDIR /load
 

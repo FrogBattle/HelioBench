@@ -1,3 +1,4 @@
+import re
 import yaml
 
 EXPERIMENT_CONFIG_FILE_PATH = "./experiment.yml"
@@ -83,6 +84,21 @@ def is_string_dockerfile_envvar(string):
         if truncated_string.isupper():
             return True, truncated_string
     return False, None
+
+
+def substitute_nested_envvar_strings(envvars, envvar_value):
+    open_seq = '${'
+    close_seq = '}'
+
+    if open_seq in envvar_value and close_seq in envvar_value:
+        regex = r"\${(.*?)\}"
+        matches = re.findall(regex, envvar_value)
+        for match in matches:
+            try:
+                envvar_value = envvar_value.replace(f"{open_seq}{match}{close_seq}", envvars.get(match))
+            except TypeError:
+                raise ConfigError(f"Could not parse {envvar_value} in service variables. Have you defined all nested environment variables above it?")
+    return envvar_value
 
 
 if __name__ == '__main__':

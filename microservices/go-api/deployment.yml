@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  go-api:
+    build: ./go-api
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/go-api-go-api:latest
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+    ports:
+      - ${GO_API_WEB_PORT}:${GO_API_WEB_PORT}
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+  go-load:
+    build: ./go-load
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/go-api-go-load:latest
+    environment:
+      - GO_LOAD_TARGET_HOST=${GO_LOAD_TARGET_HOST}
+      - GO_LOAD_NUM_CLIENTS=${GO_LOAD_NUM_CLIENTS}
+      - GO_LOAD_RUN_TIME=${GO_LOAD_RUN_TIME}
+    depends_on:
+      - go-api
+    volumes:
+      - heliobench:/home/experiment
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+volumes:
+  heliobench:
+    driver: azure_file
+    driver_opts:
+      share_name: ${AZURE_FILE_SHARE_NAME}
+      storage_account_name: ${AZURE_STORAGE_ACCOUNT_NAME}

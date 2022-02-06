@@ -2,33 +2,31 @@ version: "3.9"
 services:
   go-api:
     build: ./go-api
-    image: helioregistry.azurecr.io/go-api-go-api:latest
     environment:
       - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
     ports:
-      - ${GO_API_WEB_PORT}:${GO_API_WEB_PORT}
+      - 8080:8080
       - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
-    # networks:
-    #   - HelioBench-network
+    networks:
+      - HelioBench-network
 
   go-load:
     build: ./go-load
-    image: helioregistry.azurecr.io/go-api-go-load:latest
     environment:
-      - HOST=http://go-api:${GO_API_WEB_PORT}
-      - NUM_CLIENTS=3
-      - RUN_TIME=1m
+      - GO_LOAD_TARGET_HOST=http://go-api:8080
+      - GO_LOAD_NUM_CLIENTS=3
+      - GO_LOAD_RUN_TIME=1m
     depends_on:
       - go-api
-    # volumes:
-    #   - HelioBench:/home/experiment
-    # networks:
-    #   - HelioBench-network
+    volumes:
+      - HelioBench:/home/experiment
+    networks:
+      - HelioBench-network
 
-# volumes:
-#   HelioBench:
-#     external: true
+volumes:
+  HelioBench:
+    external: true
 
-# networks:
-#   HelioBench-network:
-#     external: true
+networks:
+  HelioBench-network:
+    external: true
