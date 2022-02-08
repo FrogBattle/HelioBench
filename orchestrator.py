@@ -19,7 +19,7 @@ from constants import (
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
     AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID,
     DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
-    PROMETHEUS_TARGET_PORT)
+    PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
 from asyncio.subprocess import PIPE
@@ -171,6 +171,7 @@ def export_service_and_deployment_envvars(service_envvars, service, deployment_c
 async def orchestrate(services, environment, service_envvars):
     experiment_start_time = time()
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
+    should_stop_prometheus = environment.get(STOP_PROMETHEUS) == "True"
 
     try:
         processes = {}
@@ -217,14 +218,15 @@ async def orchestrate(services, environment, service_envvars):
         print("Collecting logs for processes...")
         for service_details in [*processes.values(), *completed_processes.values()]:
             await collect_logs(service_details['service'], service_details['process'])
-
-        stop_prometheus_server()
+        if should_stop_prometheus:
+            stop_prometheus_server()
 
 
 def orchestrate_deployment(deployment_config, services, service_envvars, environment):
 
     compose_filename = environment.get(DEPLOYMENT_COMPOSE_FILE)
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
+    should_stop_prometheus = environment.get(STOP_PROMETHEUS) == "True"
     prometheus_hostname = f'{PROMETHEUS_SERVER_NAME}.ukwest.azurecontainer.io'
 
     subscription_id = deployment_config.get(AZURE_SUBSCRIPTION_ID)
@@ -338,7 +340,8 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
                 export_service_and_deployment_envvars(service_envvars, service_name, deployment_config))
 
     finally:
-        container_factory.delete_container_group(PROMETHEUS_SERVER_NAME)
+        if should_stop_prometheus:
+            container_factory.delete_container_group(PROMETHEUS_SERVER_NAME)
 
 
 async def main():
@@ -347,6 +350,7 @@ async def main():
     service_envvars = parse_service_envvars(config)
     environment = parse_environment(config)
     is_deployment = environment.get(DEPLOYMENT, None) == 'True'
+
     prepare_prometheus_configuration(service_envvars, is_deployment)
 
     if is_deployment:

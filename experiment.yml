@@ -21,6 +21,7 @@ services:
 
 environment:
   - PROMETHEUS_PORT=9090
+  - STOP_PROMETHEUS=False
   - DEPLOYMENT=True
   - DEPLOYMENT_COMPOSE_FILE=deployment.yml
 
