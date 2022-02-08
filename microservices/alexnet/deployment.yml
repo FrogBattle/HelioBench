@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  alexnet:
+    build: ./
+    hostname: alexnet
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-${EXPERIMENT_WORKLOAD}:latest
+    ports:
+      - 80:80
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+    restart: on-failure
+    volumes:
+      - heliobench:/home/experiment
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+
+volumes:
+  heliobench:
+    driver: azure_file
+    driver_opts:
+      share_name: ${AZURE_FILE_SHARE_NAME}
+      storage_account_name: ${AZURE_STORAGE_ACCOUNT_NAME}

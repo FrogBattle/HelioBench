@@ -2,22 +2,22 @@ services:
   # alexnet:
   #   variables:
   #    - PROMETHEUS_TARGET_PORT=9104
-  # text-analysis:
-  #   variables:
-  #    - PROMETHEUS_TARGET_PORT=9103
+  text-analysis:
+    variables:
+     - PROMETHEUS_TARGET_PORT=9103
   # nginx-web:
   #   variables:
   #    - PROMETHEUS_TARGET_PORT=9102
-  # memcached:
-  #   variables:
-  #    - PROMETHEUS_TARGET_PORT=9101
-  go-api:
+  memcached:
     variables:
-     - PROMETHEUS_TARGET_PORT=9100
-     - GO_API_WEB_PORT=80
-     - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
-     - GO_LOAD_NUM_CLIENTS=20
-     - GO_LOAD_RUN_TIME=5m
+     - PROMETHEUS_TARGET_PORT=9101
+  # go-api:
+  #   variables:
+  #    - PROMETHEUS_TARGET_PORT=9100
+  #    - GO_API_WEB_PORT=80
+  #    - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
+  #    - GO_LOAD_NUM_CLIENTS=20
+  #    - GO_LOAD_RUN_TIME=5m
 
 environment:
   - PROMETHEUS_PORT=9090

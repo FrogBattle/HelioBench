@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  nginx-web:
+    build: ./nginx
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-nginx-web:latest
+    hostname: nginx-web
+    ports:
+      - 80:80
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+    restart: on-failure
+
+  workgen-dev:
+    build: ./workgen
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-workgen-dev:latest
+    hostname: workgen-dev
+    depends_on:
+      nginx-web:
+        condition: service_started
+    restart: on-failure
+    environment:
+      - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
+      - NUM_REQUESTS=20000000
+      - NUM_CLIENTS=15
+    volumes:
+      - heliobench:/home/experiment
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+volumes:
+  heliobench:
+    driver: azure_file
+    driver_opts:
+      share_name: ${AZURE_FILE_SHARE_NAME}
+      storage_account_name: ${AZURE_STORAGE_ACCOUNT_NAME}

@@ -174,6 +174,7 @@ def build_and_push_single_docker_image(
 def build_and_push_docker_compose(
         service_name, path, compose_filename, env, logs_location='./logs/deployment/'):
 
+    print(f"Building and pushing {service_name}")
     docker_build_proc, docker_push_proc = None, None
     build_filename, push_filename = f'{logs_location}{service_name}/build', f'{logs_location}{service_name}/push'
 
@@ -202,7 +203,7 @@ def build_and_push_docker_compose(
             capture_process_log(process, f'{filename}.error', is_error_log=True)
 
 
-def deploy_docker_compose(service, compose_filename, cwd, env, ):
+def deploy_docker_compose(service, compose_filename, cwd, env):
     print(f"Deploying {service}. This may take a while...")
     cmd_run(f"docker compose -f {compose_filename} up", shell=True, check=True, cwd=cwd, env=env)
     print(f"Successfully deployed {service} at {time()}")
@@ -260,6 +261,13 @@ def ensure_docker_context(subscription_id, resource_group, context="default", co
         else:
             cmd_run(f"docker context create {context}", check=True, shell=True)
         cmd_run(f"docker context use {context}", check=True, shell=True)
+
+
+def collect_logs_and_stop_processes(processes, compose_filename):
+    for service_name, service_details in processes.items():
+        collect_compose_logs(service_name, service_details['service_path'])
+        stop_compose_process(service_name, compose_filename, service_details['service_path'],
+                             service_details['environment'])
 
 
 class AzureContainerInstanceFactory:

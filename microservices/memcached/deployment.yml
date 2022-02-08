@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  memcached:
+    build: ./memcached
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-memcached:latest
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+    ports:
+      - 11211:11211
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+  memaslap:
+    build: ./memaslap
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-memaslap:latest
+    depends_on:
+      memcached:
+        condition: service_started
+    environment:
+      - SERVERS=memcached:11211
+      - STAT_FREQ=10s
+      - TIME=5m
+      - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
+    volumes:
+      - heliobench:/home/experiment
+    domainname: ${EXPERIMENT_WORKLOAD}
+
+
+volumes:
+  heliobench:
+    driver: azure_file
+    driver_opts:
+      share_name: ${AZURE_FILE_SHARE_NAME}
+      storage_account_name: ${AZURE_STORAGE_ACCOUNT_NAME}
