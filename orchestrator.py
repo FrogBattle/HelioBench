@@ -7,7 +7,7 @@ from time import time, sleep
 from platformdirs import sys
 
 from deployment import (
-    AzureContainerInstanceFactory, build_and_push_docker_compose, build_and_push_single_docker_image, collect_compose_logs,
+    AzureContainerInstanceFactory, build_and_push_docker_compose, build_and_push_single_docker_image, collect_compose_logs, collect_logs_and_stop_processes,
     delete_storage_finish_files, deploy_docker_compose, ensure_docker_context,
     log_into_container_instances_management, log_into_resource_management, poll_storage_finish_files, stop_compose_process)
 from config_parser import (
@@ -153,8 +153,8 @@ def export_envvars(vars_dict, env=environ.copy()):
 
 def export_service_envvars(service_envvars, service, env=environ.copy()):
     if service_envvars.get(service, None) is not None:
-        env[EXPERIMENT_WORKLOAD] = service
         env = export_envvars(service_envvars.get(service), env)
+        env[EXPERIMENT_WORKLOAD] = service
     return env
 
 
@@ -165,7 +165,8 @@ def export_deployment_envvars(deployment_config, env=environ.copy()):
 
 
 def export_service_and_deployment_envvars(service_envvars, service, deployment_config):
-    return export_deployment_envvars(deployment_config, export_service_envvars(service_envvars, service))
+    env = environ.copy()
+    return export_deployment_envvars(deployment_config, export_service_envvars(service_envvars, service, env))
 
 
 async def orchestrate(services, environment, service_envvars):
@@ -223,7 +224,6 @@ async def orchestrate(services, environment, service_envvars):
 
 
 def orchestrate_deployment(deployment_config, services, service_envvars, environment):
-
     compose_filename = environment.get(DEPLOYMENT_COMPOSE_FILE)
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
     should_stop_prometheus = environment.get(STOP_PROMETHEUS) == "True"
@@ -244,6 +244,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     resource_group = res_client.resource_groups.get(deployment_config.get(AZURE_RESOURCE_GROUP))
 
     ensure_docker_context(subscription_id, resource_group.name, context="default", context_is_aci=False)
+    # cmd_run("docker login azure", shell=True, check=True)
 
     # Push Prometheus' image to registry
     prometheus_image = f"{container_registry}.azurecr.io/{PROMETHEUS_SERVER_NAME}:latest"
@@ -272,29 +273,28 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     delete_storage_finish_files(
         storage_account_name, storage_account_key, storage_share_name, services)
 
-    cmd_run("docker login azure", shell=True, check=True)
     processes = {}
     finished_processes = {}
     try:
-        for service in services:
-            service_path = f'{MICROSERVICES_PATH}{service}'
 
+        processes = {service: {
+            'environment': export_service_and_deployment_envvars(service_envvars, service, deployment_config),
+            'service_path': f'{MICROSERVICES_PATH}{service}',
+            'service': service,
+        } for service in services}
+
+        for service in services:
             build_and_push_docker_compose(
-                service, service_path, compose_filename,
-                export_service_and_deployment_envvars(service_envvars, service, deployment_config))
+                service, processes[service]['service_path'], compose_filename,
+                processes[service]['environment'])
 
         ensure_docker_context(subscription_id, resource_group.name, aci_context,  context_is_aci=True)
-
         for service in services:
-            service_path = f'{MICROSERVICES_PATH}{service}'
             deploy_docker_compose(
-                service, compose_filename, cwd=service_path,
-                env=export_service_and_deployment_envvars(service_envvars, service, deployment_config))
+                service, compose_filename, cwd=processes[service]['service_path'],
+                env=processes[service]['environment'])
 
-            processes[service] = {
-                "service": service, "start_time": time(),
-                "environment": service_envvars[service] if service in service_envvars else {}
-            }
+            processes[service]['start_time'] = time()
 
         experiment_start_time = time()
         while True:
@@ -311,9 +311,9 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
                     collect_all_service_metrics(processes[finished_service], prometheus_hostname, prometheus_port)
                     finished_processes[finished_service] = processes.pop(finished_service)
 
-                    collect_compose_logs(finished_service, f"{MICROSERVICES_PATH}{finished_service}")
+                    collect_compose_logs(finished_service, finished_processes[finished_service]['service_path'])
                     stop_compose_process(
-                        finished_service, compose_filename, f'{MICROSERVICES_PATH}{finished_service}',
+                        finished_service, compose_filename, finished_processes[finished_service]['service_path'],
                         export_service_and_deployment_envvars(service_envvars, service, deployment_config))
 
             if len(processes) == 0:
@@ -324,20 +324,11 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
 
     except KeyboardInterrupt:
         print("\nExperiment cancelled manually. Collecting logs and stopping services...")
-        for service_name in processes.keys():
-            collect_compose_logs(service_name, f"{MICROSERVICES_PATH}{finished_service}")
-            stop_compose_process(
-                compose_filename, f'{MICROSERVICES_PATH}{service_name}',
-                export_service_and_deployment_envvars(service_envvars, service_name, deployment_config))
+        collect_logs_and_stop_processes(processes, compose_filename)
 
-    except (MetricCollectionError) as e:
-        print(e)
+    except MetricCollectionError:
         print("Error collecting data. Collecting logs and stopping services...")
-        for service_name in processes.keys():
-            collect_compose_logs(service_name, f"{MICROSERVICES_PATH}{finished_service}")
-            stop_compose_process(
-                compose_filename, f'{MICROSERVICES_PATH}{service_name}',
-                export_service_and_deployment_envvars(service_envvars, service_name, deployment_config))
+        collect_logs_and_stop_processes(processes, compose_filename)
 
     finally:
         if should_stop_prometheus:
@@ -358,9 +349,16 @@ async def main():
         try:
             orchestrate_deployment(deployment_config, services, service_envvars, environment)
         except CalledProcessError as err:
-            print("Deployment command failed with error:\n", err.stderr.decode("utf-8"))
-            return
+            if err.stderr is not None:
+                print("Deployment command failed with error:\n", err.stderr.decode("utf-8"))
+                return
 
+            if err.stdout is not None:
+                print("Deployment command failed with output:\n", err.stdout.decode("utf-8"))
+                return
+
+            print("Deployment command failed. Error: ", err)
+            return
     else:
         run_prometheus_server()
         print(run_auxiliary_script('remove_finished_volumes.py', ' '.join(services), True).stdout)
