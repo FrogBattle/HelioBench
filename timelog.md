@@ -12,7 +12,24 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 19
+
+### 08 Feb 2022
+* *1.0 hours* Add deployment of other workloads - surprisingly easy. This is good! 
+* *1.0 hours* Find, pinpoint, and fix a bug with environment variables - they were getting blended for all workloads and overwritten as subsequent deployments were happening.
+* *1.5 hour* Attempt to make building and pushing of images concurrent - took a while and gave up due to time constraints. Added deployment files and tested deployments for all current workloads. Notes
+  * The `alexnet` workload spanws and runs normally but gets killed. Probably due to performance limits.
+  * The `text-analysis` workload runs too quicky and finishes before Prometheus has detected it.
+
+
 ## Week 18
+
+### 04 Feb 2022
+* *2.0 hours* Implement log fetching for each workload, add hierarchy to the logs folder for deployment to add runtime logs of workloads.
+* *2.0 hours* Improve error handling to:
+  * Support manual stop of experiments. 
+  * Collect logs even though crashes occur.
+* *2.0 hours* Figure out the coordination of prometheus and workloads as they are being deployed. Attempt multiple variants and evaluate impacts on experiments. In the case of DNS access of workloads, we achieve simplicity with about 2-3 minute maximum loss of monitoring over experiment time.
 
 ### 03 Feb 2022
 * *2.0 hours* Went on implementing deployment via Python SDK. Bumped onto an issue with the docker-compose context - contradicts the design of orchestration.
