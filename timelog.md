@@ -14,6 +14,16 @@
 
 ## Week 19
 
+### 10 Feb 2022
+* *1.0 hours* Fix the dissertation introduction as per Yehia's feedback in Jan.
+* *1.0 hours* Outline the requirements section, then decide to make it a one-page chapter on its own.
+* *1.0 hours* Go on with the Design section - modify current modules paragraphs to reflect requirements.
+* *1.0 hours* Start thinking of the architecture section. Create a diagram for high-level operation.
+* *0.5 hour* Gather progress, questions, way forward and prepare an agenda for the supervisor meeting.
+* *0.5 hour* Sit regular supervisor meeting - lots of feedback on the dissertation. Good!
+* *1.0 hour* Edit the diagram as per the feedback on it from the meeting. Start planning the architecture section.
+
+
 ### 08 Feb 2022
 * *1.0 hours* Add deployment of other workloads - surprisingly easy. This is good! 
 * *1.0 hours* Find, pinpoint, and fix a bug with environment variables - they were getting blended for all workloads and overwritten as subsequent deployments were happening.
