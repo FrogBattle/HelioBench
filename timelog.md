@@ -12,6 +12,15 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 20
+
+### 17 Feb 2022
+* *2.0 hours* Review latest feedback and write out architecture section.
+* *1.0 hour* Rectify benchmarks subjsection from the modules.
+* *1.0 hour* Write out Workloads subsection from the modules.
+* *1.0 hour* Prepare and sit regular supervisor meeting.
+
+
 ## Week 19
 
 ### 10 Feb 2022
