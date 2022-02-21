@@ -14,6 +14,10 @@
 
 ## Week 20
 
+### 21 Feb 2022
+* *1.5 hour* Write up the monitoring submodule of architecture.
+* *1.5 hour* Write up the orchestration submodule of architecture.
+
 ### 17 Feb 2022
 * *2.0 hours* Review latest feedback and write out architecture section.
 * *1.0 hour* Rectify benchmarks subjsection from the modules.
