@@ -1,16 +1,30 @@
 services:
-  # alexnet:
-  #   variables:
-  #    - PROMETHEUS_TARGET_PORT=9104
+  alexnet:
+    variables:
+     - PROMETHEUS_TARGET_PORT=9104
+     - ALEXNET_NUM_CPUS=3
+     - ALEXNET_NUM_RAM=3G
+     - ALEXNET_CPU_LIMIT=3
+     - ALEXNET_RAM_LIMIT=3G
   text-analysis:
     variables:
      - PROMETHEUS_TARGET_PORT=9103
+     - TEXT_ANALYSIS_NUM_CPUS=0.5
+     - TEXT_ANALYSIS_NUM_RAM=0.5G
+     - TEXT_ANALYSIS_CPU_LIMIT=0.5
+     - TEXT_ANALYSIS_RAM_LIMIT=0.5G
+
   # nginx-web:
   #   variables:
   #    - PROMETHEUS_TARGET_PORT=9102
   memcached:
     variables:
      - PROMETHEUS_TARGET_PORT=9101
+     - MEMCACHED_NUM_CPUS=0.5
+     - MEMCACHED_NUM_RAM=0.5G
+     - MEMCACHED_CPU_LIMIT=0.5
+     - MEMCACHED_RAM_LIMIT=0.5G
+
   # go-api:
   #   variables:
   #    - PROMETHEUS_TARGET_PORT=9100

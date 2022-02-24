@@ -13,6 +13,15 @@ services:
     volumes:
       - heliobench:/home/experiment
     domainname: ${EXPERIMENT_WORKLOAD}
+    deploy:
+      resources:
+        reservations:
+          cpus: ${TEXT_ANALYSIS_NUM_CPUS}
+          memory: ${TEXT_ANALYSIS_NUM_RAM}
+        limits:
+          cpus: ${TEXT_ANALYSIS_CPU_LIMIT}
+          memory: ${TEXT_ANALYSIS_RAM_LIMIT}
+
 
 volumes:
   heliobench:

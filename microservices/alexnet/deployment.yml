@@ -13,6 +13,15 @@ services:
     volumes:
       - heliobench:/home/experiment
     domainname: ${EXPERIMENT_WORKLOAD}
+    deploy:
+      resources:
+        reservations:
+          cpus: ${ALEXNET_NUM_CPUS}
+          memory: ${ALEXNET_NUM_RAM}
+        limits:
+          cpus: ${ALEXNET_CPU_LIMIT}
+          memory: ${ALEXNET_RAM_LIMIT}
+
 
 
 volumes:
