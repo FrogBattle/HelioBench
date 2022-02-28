@@ -24,7 +24,6 @@ from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
 from asyncio.subprocess import PIPE
 from subprocess import CalledProcessError, run as cmd_run
-from datetime import datetime
 
 DEFAULT_PROMETHEUS_PORT = '9900'
 DEFAULT_PROMETHEUS_TARGET_PORT = '9090'
@@ -168,6 +167,16 @@ def export_service_and_deployment_envvars(service_envvars, service, deployment_c
     return export_deployment_envvars(deployment_config, export_service_envvars(service_envvars, service, env))
 
 
+def compute_formatted_duration(duration_in_seconds):
+    minutes = round(duration_in_seconds // 60)
+    seconds = round(duration_in_seconds % 60)
+    if(minutes < 10):
+        minutes = f'0{minutes}'
+    if seconds < 10:
+        seconds = f'0{seconds}'
+    return f'{minutes}:{seconds}'
+
+
 async def orchestrate(services, environment, service_envvars):
     experiment_start_time = time()
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
@@ -184,11 +193,10 @@ async def orchestrate(services, environment, service_envvars):
             }
             print(f"Started process for {service}")
 
-        sleep(5)
         while True:
             result = json.loads(run_auxiliary_script('poll_for_finish_files.py').stdout)
-            duration = datetime.fromtimestamp(time() - experiment_start_time)
-            print("Experiment running:", duration.strftime('%H:%M:%S'), end='\r')
+            duration = time() - experiment_start_time
+            print("Experiment running:", compute_formatted_duration(duration), end='\r')
 
             if('status' in result and 'filenames' in result and result['status'] == 'success'):
                 finished_services = result['filenames']
@@ -299,8 +307,8 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
         experiment_start_time = time()
         while True:
 
-            duration = datetime.fromtimestamp(time() - experiment_start_time)
-            print("Experiment running:", duration.strftime('%H:%M:%S'), end='\r')
+            duration = time() - experiment_start_time
+            print("Experiment running:", compute_formatted_duration(duration), end='\r')
 
             finish_files = poll_storage_finish_files(storage_account_name, storage_account_key, storage_share_name)
             for finished_file in finish_files:
