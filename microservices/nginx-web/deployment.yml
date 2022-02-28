@@ -10,6 +10,15 @@ services:
     environment:
       - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
     restart: on-failure
+    deploy:
+      resources:
+        reservations:
+          cpus: ${NGINX_NUM_CPUS}
+          memory: ${NGINX_NUM_RAM}
+        limits:
+          cpus: ${NGINX_CPU_LIMIT}
+          memory: ${NGINX_RAM_LIMIT}
+
 
   workgen-dev:
     build: ./workgen
@@ -21,11 +30,11 @@ services:
     restart: on-failure
     environment:
       - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
-      - NUM_REQUESTS=20000000
+      - NUM_REQUESTS=10000000
       - NUM_CLIENTS=15
     volumes:
       - heliobench:/home/experiment
-    domainname: ${EXPERIMENT_WORKLOAD}
+    domainname: ${DOMAIN_NAME}
 
 volumes:
   heliobench:

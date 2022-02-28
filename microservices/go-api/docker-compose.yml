@@ -16,6 +16,7 @@ services:
       - GO_LOAD_TARGET_HOST=http://go-api:8080
       - GO_LOAD_NUM_CLIENTS=3
       - GO_LOAD_RUN_TIME=1m
+      - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
     depends_on:
       - go-api
     volumes:

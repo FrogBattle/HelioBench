@@ -29,7 +29,9 @@ Batch = namedtuple('Batch', ['data'])
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 DATASET_NAME = 'cifar-10-python.tar.gz'
-if __name__ == '__main__':
+
+
+def run():
     print("Running inference of an 18-layer Resnet pretrained model on a CIFAR10 dataset")
     path = 'http://data.mxnet.io/models/imagenet/'
     [mx.test_utils.download(path+'resnet/18-layers/resnet-18-0000.params'),
@@ -53,8 +55,7 @@ if __name__ == '__main__':
         duration_in_seconds = int(duration.split('m')[0]) * 60
     except ValueError:
         print("Error parsing duration. Specify minutes in format MMMMm.")
-    should_stop = False
-    while True and not should_stop:
+    while True:
         for image_index, image in enumerate(train_images):
             img = mx.image.imresize(mx.nd.array(image), 1536, 1536)  # resize
             img = img.transpose((2, 0, 1))  # Channel first
@@ -69,7 +70,11 @@ if __name__ == '__main__':
             for i in a[0:2]:
                 print('Inferred probability=%f, class=%s' % (prob[i], class_names[train_labels[i][0]]))
             print('')
+
             if time() > start_time + duration_in_seconds:
                 print("Experiment finished")
-                should_stop = True
-                break
+                return
+
+
+if __name__ == '__main__':
+    run()

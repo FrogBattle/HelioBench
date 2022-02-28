@@ -17,8 +17,8 @@ from config_parser import (
 from constants import (
     AZURE_CONTAINER_REGISTRY, AZURE_CONTAINER_REGISTRY_PASSWORD, AZURE_CONTAINER_REGISTRY_USERNAME, AZURE_DOCKER_ACI_CONTEXT,
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
-    AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID,
-    DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
+    AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID,
+    DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
     PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
@@ -41,7 +41,6 @@ CONTAINER_SCRIPTS_FOLDER = '/home/scripts/'
 DOCKER_COMPOSE_COMMAND = 'docker-compose up --build'
 
 DOCKER_VOLUME_NAME = 'HelioBench'
-DOCKER_COMPOSE_VOLUME_PATH = f'/var/lib/docker/volumes/{DOCKER_VOLUME_NAME}/_data'
 
 QUERY_MAPPING = {
     'CPU_USER_PRC': "avg by (instance) (irate(node_cpu_seconds_total{mode='user'}[1m])) * 100",
@@ -101,7 +100,7 @@ async def run_benchmark(service, env):
 
 
 async def collect_logs(service, process):
-    service_dir = f'{LOGS_FOLDER}{service}/'
+    service_dir = f'{LOGS_FOLDER}local/{service}/'
     if not path.exists(service_dir):
         makedirs(service_dir)
 
@@ -139,7 +138,7 @@ def prepare_prometheus_configuration(service_envvars, is_deployment):
     prom_config = parse_config(PROMETHEUS_CONFIG_FILE_PATH)
 
     prom_config['scrape_configs'][0]['static_configs'][0]['targets'] = [
-        f'{"localhost" if not is_deployment else f"{service_name}.ukwest.azurecontainer.io"}'
+        f'{"localhost" if not is_deployment else f"{service_envvars.get(DOMAIN_NAME, service_name)}.ukwest.azurecontainer.io"}'
         f':{service_envvars.get(PROMETHEUS_TARGET_PORT, DEFAULT_PROMETHEUS_TARGET_PORT )}'
         for service_name, service_envvars in service_envvars.items() if service_envvars is not None]
     save_config(PROMETHEUS_CONFIG_FILE_PATH, prom_config)
@@ -237,6 +236,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     storage_account_key = deployment_config.get(AZURE_STORAGE_ACCOUNT_KEY)
     storage_share_name = deployment_config.get(AZURE_FILE_SHARE_NAME)
     aci_context = deployment_config.get(AZURE_DOCKER_ACI_CONTEXT)
+    tenant_id = deployment_config.get(AZURE_TENANT_ID)
 
     print("Authenticating...")
     container_instance_client = log_into_container_instances_management(subscription_id)
@@ -288,7 +288,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
                 service, processes[service]['service_path'], compose_filename,
                 processes[service]['environment'])
 
-        ensure_docker_context(subscription_id, resource_group.name, aci_context,  context_is_aci=True)
+        ensure_docker_context(subscription_id, resource_group.name, aci_context, context_is_aci=True, tenant_id=tenant_id)
         for service in services:
             deploy_docker_compose(
                 service, compose_filename, cwd=processes[service]['service_path'],
@@ -312,9 +312,8 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
                     finished_processes[finished_service] = processes.pop(finished_service)
 
                     collect_compose_logs(finished_service, finished_processes[finished_service]['service_path'])
-                    stop_compose_process(
-                        finished_service, compose_filename, finished_processes[finished_service]['service_path'],
-                        export_service_and_deployment_envvars(service_envvars, service, deployment_config))
+                    stop_compose_process(finished_service, compose_filename, finished_processes[finished_service]['service_path'],
+                                         finished_processes[finished_service]['environment'])
 
             if len(processes) == 0:
                 print("Experiment finished")
@@ -349,11 +348,11 @@ async def main():
         try:
             orchestrate_deployment(deployment_config, services, service_envvars, environment)
         except CalledProcessError as err:
-            if err.stderr is not None:
+            if err.stderr is not None and err.stderr != b'':
                 print("Deployment command failed with error:\n", err.stderr.decode("utf-8"))
                 return
 
-            if err.stdout is not None:
+            if err.stdout is not None and err.stdout != b'':
                 print("Deployment command failed with output:\n", err.stdout.decode("utf-8"))
                 return
 

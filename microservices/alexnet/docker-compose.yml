@@ -4,10 +4,10 @@ services:
     build: ./
     hostname: alexnet
     ports:
-      - "80:80"
       - "${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}"
     environment:
       - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+      - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
     restart: on-failure
     networks:
       - HelioBench-network

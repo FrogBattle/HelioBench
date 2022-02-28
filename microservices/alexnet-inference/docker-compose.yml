@@ -8,6 +8,7 @@ services:
     environment:
       - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
       - ALEXNET_INFERENCE_DURATION=${ALEXNET_INFERENCE_DURATION}
+      - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
     restart: on-failure
     networks:
       - HelioBench-network

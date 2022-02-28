@@ -18,6 +18,13 @@ from azure.storage.file import (
 from config_parser import is_string_dockerfile_envvar, parse_variables
 
 
+class AzureAuthenticationError(Exception):
+    def __init__(
+            self, message="An authentication error with Azure occurred"):
+        self.message = message
+        super().__init__(self.message)
+
+
 class HandledCalledProcessError(Exception):
     def __init__(
             self, command, logs_path,
@@ -83,6 +90,9 @@ def build_and_push_single_docker_image(
         docker_push_proc = cmd_run(push_command, shell=True, check=True, stdout=PIPE, stderr=PIPE)
     except CalledProcessError as err:
         capture_process_log(err, f'{push_path}.error', is_error_log=True)
+        if "unauthorized" in err.stderr.decode("utf-8"):
+
+            raise AzureAuthenticationError("Container registry authorization failed. Please run 'az acr login --name {registry_name}'.")
         raise HandledCalledProcessError(push_command, f'{push_path}.error')
 
     if docker_build_proc is not None and docker_push_proc is not None:
@@ -96,85 +106,10 @@ def build_and_push_single_docker_image(
     return full_image_name
 
 
-# def build_and_push_multicontainer_subservice(
-#         full_image_name, service_name, container_service, path, env, logs_location):
-
-#     docker_build_proc = None
-#     docker_push_proc = None
-#     build_path = f'{logs_location}{service_name}/build'
-#     push_path = f'{logs_location}{service_name}/push'
-
-#     build_command = f"docker build -t {full_image_name} {path}/{container_service}"
-#     try:
-#         print(f"Building {full_image_name}...")
-#         docker_build_proc = cmd_run(build_command, shell=True, check=True, stdout=PIPE, stderr=PIPE, env=env)
-
-#     except CalledProcessError as err:
-#         capture_process_log(err, f'{build_path}.error', is_error_log=True)
-#         raise HandledCalledProcessError(build_command, f'{build_path}.error')
-
-#     if docker_build_proc is not None:
-#         capture_process_log(docker_build_proc, f'{build_path}.log', is_error_log=False)
-#         capture_process_log(docker_build_proc, f'{build_path}.error', is_error_log=True)
-
-#     push_command = f"docker push {full_image_name}"
-#     try:
-#         print(f"Pushing {full_image_name}...")
-#         docker_push_proc = cmd_run(push_command, shell=True, check=True,
-#                                    stdout=PIPE, stderr=PIPE, cwd=path, env=env)
-#     except CalledProcessError as err:
-#         capture_process_log(err, f'{push_path}.error', is_error_log=True)
-#         raise HandledCalledProcessError(push_command, f'{push_path}.error')
-
-#     if docker_push_proc is not None:
-#         capture_process_log(docker_push_proc, f'{push_path}.log', is_error_log=False)
-#         capture_process_log(docker_push_proc, f'{push_path}.error', is_error_log=True)
-
-
-# def build_and_push_multi_container_image(
-#         container_registry, full_image_name, service_name,
-#         path, env, docker_compose_config, logs_location='./logs/deployment/'):
-
-#     container_services = list(docker_compose_config.get('services').keys())
-
-#     for container_service in container_services:
-#         full_image_name = f"{container_registry}.azurecr.io/{service_name}-{container_service}:latest"
-
-#         build_and_push_multicontainer_subservice(
-#             full_image_name, service_name, container_service, path, env, logs_location)
-
-
-# def build_and_push_docker_compose_images(
-#         container_registry, container_registry_username,
-#         container_registry_password, service_name,
-#         path, tag='latest', logs_location='./logs/deployment/'):
-#     full_image_name = f"{container_registry}.azurecr.io/{service_name}:{tag}"
-
-#     docker_build_proc = cmd_run(f"docker build -t {full_image_name} {path}",
-#                                 shell=True, check=True, stdout=PIPE, stderr=PIPE)
-
-#     auth_proc = cmd_run(
-#         f"echo '{container_registry_password}' | docker login {container_registry}.azurecr.io --username={container_registry_username} --password-stdin",
-#         shell=True, check=True, stdout=PIPE, stderr=PIPE)
-
-#     docker_push_proc = cmd_run(f"docker push {full_image_name}",
-#                                shell=True, check=True, stdout=PIPE, stderr=PIPE)
-
-#     for process, filename in [
-#         (docker_build_proc, f'build_{service_name}'),
-#         (auth_proc, f'auth_{container_registry}'),
-#         (docker_push_proc, f'push_{service_name}')
-#     ]:
-#         capture_process_log(process, f'{logs_location}{filename}.log', is_error_log=False)
-#         capture_process_log(process, f'{logs_location}{filename}.error', is_error_log=True)
-
-#     return full_image_name
-
-
 def build_and_push_docker_compose(
         service_name, path, compose_filename, env, logs_location='./logs/deployment/'):
 
-    print(f"Building and pushing {service_name}")
+    print(f"Building and pushing {service_name}...")
     docker_build_proc, docker_push_proc = None, None
     build_filename, push_filename = f'{logs_location}{service_name}/build', f'{logs_location}{service_name}/push'
 
@@ -246,7 +181,7 @@ def poll_storage_finish_files(storage_account_name, storage_account_key, share_n
     return current_filenames
 
 
-def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True):
+def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True, tenant_id=None):
     try:
         cmd_run(f"docker context use {context}", check=True, shell=True, capture_output=True)
     except CalledProcessError as err:
@@ -255,9 +190,9 @@ def ensure_docker_context(subscription_id, resource_group, context="default", co
 
         print(f"Did not find Docker context {context}, creating it now...")
         if context_is_aci:
-            cmd_run(f"docker context create aci {context} --subscription-id={subscription_id}"
-                    f" --resource-group={resource_group}",
-                    check=True, shell=True)
+            context_create_command = (f"docker context create aci {context} --subscription-id {subscription_id}"
+                                      f" --resource-group {resource_group}")
+            cmd_run(context_create_command, check=True, shell=True)
         else:
             cmd_run(f"docker context create {context}", check=True, shell=True)
         cmd_run(f"docker context use {context}", check=True, shell=True)
@@ -380,10 +315,6 @@ class AzureContainerInstanceFactory:
         print(f"Successfully deployed {container_group_name}")
         return container_group.ip_address.ip
 
-        # print("Once DNS has propagated, container group '{0}' will be reachable at"
-        #     " http://{1}".format(
-        # container_group_name, container_group.ip_address.fqdn))
-
     def create_container_group_multi(self, container_group_name, containers, ports):
 
         container_instance_client = self.container_instance_client
@@ -423,8 +354,6 @@ class AzureContainerInstanceFactory:
             resource_group.name, container_group_name)
 
         print(f"Successfully deployed group {container_group_name}")
-        # print("Deployd", isinstance(container_group, ContainerGroup), container_group)
-        # print("instance view state", container_group.instance_view.state)
         return container_group.ip_address.ip
 
     def delete_container_group(self, container_group_name):

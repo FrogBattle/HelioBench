@@ -50,4 +50,4 @@ else
 fi
 
 ### HelioBench: Indicate experiment finish
-touch /home/experiment/go-api.finish
+touch /home/experiment/$EXPERIMENT_WORKLOAD.finish

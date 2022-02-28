@@ -3,7 +3,7 @@ services:
   text-analysis:
     build: .
     image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-${EXPERIMENT_WORKLOAD}-dev:latest
-    hostname: text-analysis
+    hostname: ${EXPERIMENT_WORKLOAD}
     ports:
       - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
     environment:
@@ -12,7 +12,7 @@ services:
     restart: on-failure
     volumes:
       - heliobench:/home/experiment
-    domainname: ${EXPERIMENT_WORKLOAD}
+    domainname: ${DOMAIN_NAME}
     deploy:
       resources:
         reservations:

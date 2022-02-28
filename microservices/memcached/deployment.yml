@@ -8,7 +8,7 @@ services:
     ports:
       - 11211:11211
       - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
-    domainname: ${EXPERIMENT_WORKLOAD}
+    domainname: ${DOMAIN_NAME}
     deploy:
       resources:
         reservations:
@@ -32,7 +32,7 @@ services:
       - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
     volumes:
       - heliobench:/home/experiment
-    domainname: ${EXPERIMENT_WORKLOAD}
+    domainname: ${DOMAIN_NAME}
 
 
 volumes:
