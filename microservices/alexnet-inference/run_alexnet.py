@@ -32,6 +32,9 @@ DATASET_NAME = 'cifar-10-python.tar.gz'
 
 
 def run():
+    # Set seed for reproducible workloads
+    np.random.seed(0)
+
     print("Running inference of an 18-layer Resnet pretrained model on a CIFAR10 dataset")
     path = 'http://data.mxnet.io/models/imagenet/'
     [mx.test_utils.download(path+'resnet/18-layers/resnet-18-0000.params'),
@@ -56,24 +59,26 @@ def run():
     except ValueError:
         print("Error parsing duration. Specify minutes in format MMMMm.")
     while True:
-        for image_index, image in enumerate(train_images):
-            img = mx.image.imresize(mx.nd.array(image), 1536, 1536)  # resize
-            img = img.transpose((2, 0, 1))  # Channel first
-            img = img.expand_dims(axis=0)  # batchify
-            # compute the predict probabilities
-            mod.forward(Batch([img]))
-            prob = mod.get_outputs()[0].asnumpy()
-            # print the top-3
-            prob = np.squeeze(prob)
-            a = np.argsort(prob)[::-1]
-            print(f"Inference for picture {image_index}")
-            for i in a[0:2]:
-                print('Inferred probability=%f, class=%s' % (prob[i], class_names[train_labels[i][0]]))
-            print('')
+        image_index = np.random.randint(0, len(train_images))
+        image = train_images[image_index]
+        # for image_index, image in enumerate(train_images):
+        img = mx.image.imresize(mx.nd.array(image), 1536, 1536)  # resize
+        img = img.transpose((2, 0, 1))  # Channel first
+        img = img.expand_dims(axis=0)  # batchify
+        # compute the predict probabilities
+        mod.forward(Batch([img]))
+        prob = mod.get_outputs()[0].asnumpy()
+        # print the top-3
+        prob = np.squeeze(prob)
+        a = np.argsort(prob)[::-1]
+        print(f"Inference for picture {image_index}")
+        for i in a[0:2]:
+            print('Inferred probability=%f, class=%s' % (prob[i], class_names[train_labels[i][0]]))
+        print('')
 
-            if time() > start_time + duration_in_seconds:
-                print("Experiment finished")
-                return
+        if time() > start_time + duration_in_seconds:
+            print("Experiment finished")
+            return
 
 
 if __name__ == '__main__':
