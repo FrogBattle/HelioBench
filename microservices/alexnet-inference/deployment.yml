@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  alexnet-inference:
+    build: ./
+    hostname: ${EXPERIMENT_WORKLOAD}
+    image: ${AZURE_CONTAINER_REGISTRY}.azurecr.io/${EXPERIMENT_WORKLOAD}-${EXPERIMENT_WORKLOAD}:latest
+    ports:
+      - ${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+      - ALEXNET_INFERENCE_DURATION=${ALEXNET_INFERENCE_DURATION}
+    restart: on-failure
+    volumes:
+      - heliobench:/home/experiment
+    domainname: ${DOMAIN_NAME}
+    deploy:
+      resources:
+        reservations:
+          cpus: ${ALEXNET_INFERENCE_NUM_CPUS}
+          memory: ${ALEXNET_INFERENCE_NUM_RAM}
+        limits:
+          cpus: ${ALEXNET_INFERENCE_CPU_LIMIT}
+          memory: ${ALEXNET_INFERENCE_RAM_LIMIT}
+
+volumes:
+  heliobench:
+    driver: azure_file
+    driver_opts:
+      share_name: ${AZURE_FILE_SHARE_NAME}
+      storage_account_name: ${AZURE_STORAGE_ACCOUNT_NAME}

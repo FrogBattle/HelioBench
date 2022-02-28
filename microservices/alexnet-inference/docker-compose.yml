@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  alexnet-inference:
+    build: ./
+    hostname: alexnet-inference
+    ports:
+      - "${PROMETHEUS_TARGET_PORT}:${PROMETHEUS_TARGET_PORT}"
+    environment:
+      - PROMETHEUS_TARGET_PORT=${PROMETHEUS_TARGET_PORT}
+      - ALEXNET_INFERENCE_DURATION=${ALEXNET_INFERENCE_DURATION}
+    restart: on-failure
+    networks:
+      - HelioBench-network
+    volumes:
+      - HelioBench:/home/experiment
+
+volumes:
+  HelioBench:
+    external: true
+
+networks:
+  HelioBench-network:
+    external: true
