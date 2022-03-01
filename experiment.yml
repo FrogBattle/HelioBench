@@ -7,15 +7,15 @@ services:
   #    - ALEXNET_NUM_RAM=16G
   #    - ALEXNET_CPU_LIMIT=4
   #    - ALEXNET_RAM_LIMIT=16G
-  alexnet-inference:
-    variables:
-     - DOMAIN_NAME=alexnet-inference2
-     - PROMETHEUS_TARGET_PORT=9105
-     - ALEXNET_INFERENCE_DURATION=20m
-     - ALEXNET_INFERENCE_NUM_CPUS=4
-     - ALEXNET_INFERENCE_NUM_RAM=16G
-     - ALEXNET_INFERENCE_CPU_LIMIT=4
-     - ALEXNET_INFERENCE_RAM_LIMIT=16G
+  # alexnet-inference:
+  #   variables:
+  #    - DOMAIN_NAME=alexnet-inference2
+  #    - PROMETHEUS_TARGET_PORT=9105
+  #    - ALEXNET_INFERENCE_DURATION=20m
+  #    - ALEXNET_INFERENCE_NUM_CPUS=4
+  #    - ALEXNET_INFERENCE_NUM_RAM=16G
+  #    - ALEXNET_INFERENCE_CPU_LIMIT=4
+  #    - ALEXNET_INFERENCE_RAM_LIMIT=16G
   # text-analysis:
   #   variables:
   #    - DOMAIN_NAME=text-analysis2
@@ -38,10 +38,10 @@ services:
      - DOMAIN_NAME=memcached2
      - PROMETHEUS_TARGET_PORT=9101
      - MEMASLAP_EXPERIMENT_DURATION=20m
-     - MEMCACHED_NUM_CPUS=2.0
-     - MEMCACHED_NUM_RAM=4.0G
-     - MEMCACHED_CPU_LIMIT=2.0
-     - MEMCACHED_RAM_LIMIT=4.0G
+     - MEMCACHED_NUM_CPUS=2
+     - MEMCACHED_NUM_RAM=4G
+     - MEMCACHED_CPU_LIMIT=2
+     - MEMCACHED_RAM_LIMIT=4G
   go-api:
     variables:
      - PROMETHEUS_TARGET_PORT=9100
@@ -50,10 +50,10 @@ services:
      - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
      - GO_LOAD_NUM_CLIENTS=50
      - GO_LOAD_RUN_TIME=20m
-     - GO_API_NUM_CPUS=2.0
-     - GO_API_NUM_RAM=2.0G
-     - GO_API_CPU_LIMIT=2.0
-     - GO_API_RAM_LIMIT=2.0G
+    #  - GO_API_NUM_CPUS=4
+    #  - GO_API_NUM_RAM=2G
+    #  - GO_API_CPU_LIMIT=4
+    #  - GO_API_RAM_LIMIT=2G
 
 environment:
   - PROMETHEUS_PORT=9090

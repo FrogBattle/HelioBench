@@ -12,11 +12,11 @@ services:
     deploy:
       resources:
         reservations:
-          cpus: ${GO_API_NUM_CPUS}
-          memory: ${GO_API_NUM_RAM}
+          cpus: '3.8'
+          memory: '2.0G'
         limits:
-          cpus: ${GO_API_CPU_LIMIT}
-          memory: ${GO_API_RAM_LIMIT}
+          cpus: '3.8'
+          memory: '2.0G'
 
 
   go-load:
@@ -32,6 +32,15 @@ services:
     volumes:
       - heliobench:/home/experiment
     domainname: ${DOMAIN_NAME}
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: '0.1G'
+        limits:
+          cpus: '0.1'
+          memory: '0.1G'
+
 
 volumes:
   heliobench:
