@@ -15,23 +15,24 @@ from config_parser import (
     parse_azure, parse_config, parse_environment,
     parse_service_envvars, save_config, substitute_nested_envvar_strings)
 from constants import (
-    AZURE_CONTAINER_REGISTRY, AZURE_CONTAINER_REGISTRY_PASSWORD, AZURE_CONTAINER_REGISTRY_USERNAME, AZURE_DOCKER_ACI_CONTEXT,
+    AZURE_CONTAINER_REGISTRY, AZURE_CONTAINER_REGISTRY_PASSWORD, AZURE_CONTAINER_REGISTRY_REGION, AZURE_CONTAINER_REGISTRY_USERNAME, AZURE_DOCKER_ACI_CONTEXT,
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
     AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID,
     DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
     PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
-from asyncio.subprocess import PIPE
+from asyncio.subprocess import DEVNULL, PIPE
 from subprocess import CalledProcessError, run as cmd_run
 
 DEFAULT_PROMETHEUS_PORT = '9900'
 DEFAULT_PROMETHEUS_TARGET_PORT = '9090'
 DEFAULT_PROMETHEUS_HOSTNAME = 'localhost'
+DEFAULT_DEPLOYMENT_COMPOSE_FILE = 'deployment.yml'
+
 MICROSERVICES_PATH = './microservices/'
 PROMETHEUS_FOLDER = '$(pwd)/microservices/prometheus/'
 PROMETHEUS_SERVER_NAME = 'helio-prometheus'
-
 LOCAL_SCRIPTS_FOLDER = '$(pwd)/scripts/'
 LOGS_FOLDER = './logs/'
 RESULTS_FOLDER = './results/'
@@ -122,22 +123,22 @@ async def collect_logs(service, process):
 
 def run_prometheus_server():
     print("Starting Prometheus server...")
-    cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=None)
-    cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=None)
+    cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=DEVNULL, stderr=DEVNULL)
+    cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=DEVNULL, stderr=DEVNULL)
 
 
 def stop_prometheus_server():
     print("Shutting down Prometheus server...")
-    cmd_run(f'docker container stop {PROMETHEUS_SERVER_NAME}', shell=True, stdout=None)
-    cmd_run(f'docker container rm {PROMETHEUS_SERVER_NAME}', shell=True, stdout=None)
+    cmd_run(f'docker container stop {PROMETHEUS_SERVER_NAME}', shell=True, stdout=DEVNULL)
+    cmd_run(f'docker container rm {PROMETHEUS_SERVER_NAME}', shell=True, stdout=DEVNULL)
 
 
-def prepare_prometheus_configuration(service_envvars, is_deployment):
+def prepare_prometheus_configuration(service_envvars, is_deployment, cr_region):
     print("Preparing Prometheus server configuration...")
     prom_config = parse_config(PROMETHEUS_CONFIG_FILE_PATH)
 
     prom_config['scrape_configs'][0]['static_configs'][0]['targets'] = [
-        f'{"localhost" if not is_deployment else f"{service_envvars.get(DOMAIN_NAME, service_name)}.ukwest.azurecontainer.io"}'
+        f'{service_name if not is_deployment else f"{service_envvars.get(DOMAIN_NAME, service_name)}.{cr_region}.azurecontainer.io"}'
         f':{service_envvars.get(PROMETHEUS_TARGET_PORT, DEFAULT_PROMETHEUS_TARGET_PORT )}'
         for service_name, service_envvars in service_envvars.items() if service_envvars is not None]
     save_config(PROMETHEUS_CONFIG_FILE_PATH, prom_config)
@@ -180,7 +181,7 @@ def compute_formatted_duration(duration_in_seconds):
 async def orchestrate(services, environment, service_envvars):
     experiment_start_time = time()
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
-    should_stop_prometheus = environment.get(STOP_PROMETHEUS) == "True"
+    should_not_stop_prometheus = environment.get(STOP_PROMETHEUS) == "False"
 
     try:
         processes = {}
@@ -226,15 +227,14 @@ async def orchestrate(services, environment, service_envvars):
         print("Collecting logs for processes...")
         for service_details in [*processes.values(), *completed_processes.values()]:
             await collect_logs(service_details['service'], service_details['process'])
-        if should_stop_prometheus:
+        if not should_not_stop_prometheus:
             stop_prometheus_server()
 
 
 def orchestrate_deployment(deployment_config, services, service_envvars, environment):
-    compose_filename = environment.get(DEPLOYMENT_COMPOSE_FILE)
+    compose_filename = environment.get(DEPLOYMENT_COMPOSE_FILE, DEFAULT_DEPLOYMENT_COMPOSE_FILE)
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
-    should_stop_prometheus = environment.get(STOP_PROMETHEUS) == "True"
-    prometheus_hostname = f'{PROMETHEUS_SERVER_NAME}.ukwest.azurecontainer.io'
+    should_not_stop_prometheus = environment.get(STOP_PROMETHEUS) == "False"
 
     subscription_id = deployment_config.get(AZURE_SUBSCRIPTION_ID)
     container_registry = deployment_config.get(AZURE_CONTAINER_REGISTRY)
@@ -245,6 +245,9 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     storage_share_name = deployment_config.get(AZURE_FILE_SHARE_NAME)
     aci_context = deployment_config.get(AZURE_DOCKER_ACI_CONTEXT)
     tenant_id = deployment_config.get(AZURE_TENANT_ID)
+    azure_container_registry_region = deployment_config.get(AZURE_CONTAINER_REGISTRY_REGION)
+
+    prometheus_hostname = f'{PROMETHEUS_SERVER_NAME}.{azure_container_registry_region}.azurecontainer.io'
 
     print("Authenticating...")
     container_instance_client = log_into_container_instances_management(subscription_id)
@@ -338,7 +341,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
         collect_logs_and_stop_processes(processes, compose_filename)
 
     finally:
-        if should_stop_prometheus:
+        if not should_not_stop_prometheus:
             container_factory.delete_container_group(PROMETHEUS_SERVER_NAME)
 
 
@@ -349,10 +352,10 @@ async def main():
     environment = parse_environment(config)
     is_deployment = environment.get(DEPLOYMENT, None) == 'True'
 
-    prepare_prometheus_configuration(service_envvars, is_deployment)
-
     if is_deployment:
         deployment_config = parse_azure(config)
+        cr_region = deployment_config.get(AZURE_CONTAINER_REGISTRY_REGION)
+        prepare_prometheus_configuration(service_envvars, is_deployment, cr_region)
         try:
             orchestrate_deployment(deployment_config, services, service_envvars, environment)
         except CalledProcessError as err:
@@ -367,6 +370,7 @@ async def main():
             print("Deployment command failed. Error: ", err)
             return
     else:
+        prepare_prometheus_configuration(service_envvars, is_deployment, None)
         run_prometheus_server()
         print(run_auxiliary_script('remove_finished_volumes.py', ' '.join(services), True).stdout)
         await orchestrate(services, environment, service_envvars)
