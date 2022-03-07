@@ -12,6 +12,38 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 22
+
+### 03 Mar 2022
+* *2.0 hours* Finish Implementation section.
+* *1.5 hours* Write up progress around evaluation and main strategy to be performed. High-level Evaluation plan.
+* *0.5 hour* Plan out weekly supervisor meeting. 
+* *0.5 hour* Carry out weekly supervisor meeting.
+
+## Week 21
+
+### 02 Mar 2022
+* *2.5 hours* Progress Deployment subsection of the Implementation section.
+
+### 01 Mar 2022
+* *4.0 hours* Carry out more remote experiments as part of the evaluation. Perform scenario analysis and write up conclusions.
+
+### 28 Feb 2022
+* *3.0 hours* Create an ML inference benchmark and add it to the suite.
+* *1.0 hours* Specify documentation, experiment motivations, and approach.
+* *3.0 hours* Carry out remote experiments, implementing small improvements as needed. Save outputs & code.
+
+### 25 Feb 2022
+* *1.5 hour* Finish the Benchmarks subsection of Implementation.
+* *3.5 hour* Finish the Orchestration subsection of Implementation.
+
+### 24 Feb 2022
+* *3.0 hours* Come up with a strategy/approach for Evaluation. Experiments, etc. Write up in summary.
+* *1.0 hour* High level Implementation plan.
+* *0.5 hour* Plan out weekly supervisor meeting. 
+* *0.5 hour* Carry out weekly supervisor meeting.
+* *3.5 hours* Progress Implementation chapter as per the plan written above.
+
 ## Week 20
 
 ### 21 Feb 2022
