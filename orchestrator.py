@@ -274,6 +274,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
         container_group_name=PROMETHEUS_SERVER_NAME,
         container_image_name=prometheus_image,
         ports=[int(environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT))],
+        dns_name='helio-prometheus-2'
     )
     if prometheus_ip is None:
         print("Error obtaining container IP. Is the group running?", file=sys.stderr)
