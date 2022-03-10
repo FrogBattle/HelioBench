@@ -17,7 +17,7 @@ from config_parser import (
 from constants import (
     AZURE_CONTAINER_REGISTRY, AZURE_CONTAINER_REGISTRY_PASSWORD, AZURE_CONTAINER_REGISTRY_REGION, AZURE_CONTAINER_REGISTRY_USERNAME, AZURE_DOCKER_ACI_CONTEXT,
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
-    AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID,
+    AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID,
     DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
     PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
@@ -244,7 +244,6 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     storage_account_key = deployment_config.get(AZURE_STORAGE_ACCOUNT_KEY)
     storage_share_name = deployment_config.get(AZURE_FILE_SHARE_NAME)
     aci_context = deployment_config.get(AZURE_DOCKER_ACI_CONTEXT)
-    tenant_id = deployment_config.get(AZURE_TENANT_ID)
     azure_container_registry_region = deployment_config.get(AZURE_CONTAINER_REGISTRY_REGION)
 
     prometheus_hostname = f'{PROMETHEUS_SERVER_NAME}.{azure_container_registry_region}.azurecontainer.io'
@@ -300,7 +299,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
                 service, processes[service]['service_path'], compose_filename,
                 processes[service]['environment'])
 
-        ensure_docker_context(subscription_id, resource_group.name, aci_context, context_is_aci=True, tenant_id=tenant_id)
+        ensure_docker_context(subscription_id, resource_group.name, aci_context, context_is_aci=True)
         for service in services:
             deploy_docker_compose(
                 service, compose_filename, cwd=processes[service]['service_path'],

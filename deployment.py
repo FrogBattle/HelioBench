@@ -181,7 +181,7 @@ def poll_storage_finish_files(storage_account_name, storage_account_key, share_n
     return current_filenames
 
 
-def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True, tenant_id=None):
+def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True):
     try:
         cmd_run(f"docker context use {context}", check=True, shell=True, capture_output=True)
     except CalledProcessError as err:

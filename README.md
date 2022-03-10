@@ -45,6 +45,5 @@ The configurations available within `experiment.yml` relevant to Azure include:
 | `AZURE_STORAGE_ACCOUNT_KEY`         | Azure Storage key for the creation and polling of finish files.                                                              | Required. |
 | `AZURE_FILE_SHARE_NAME`             | Azure File Share - the actual FS shared between services where files are created/deleted.                                    | Required. |
 | `AZURE_DOCKER_ACI_CONTEXT`          | The Docker context required by the Docker compose integration to work with Azure ACIs.                                       | Required. |
-| `AZURE_TENANT_ID`                   | This is required when having more than one Azure Directories. It specifies within which directory HelioBench should operate. | Optional. |
 
 After setting all required configurations, HelioBench should run successfully by running `python3 orchestrator.py` as usual.

@@ -66,16 +66,20 @@ def parse_service_envvars(config):
 
 def parse_environment(config):
     env = config.get('environment', {})
-    if env is not None:
+    if env is None:
+        env = {}
+    if len(env) != 0:
         env = parse_variables(env)
-    return {}
+    return env
 
 
 def parse_azure(config):
-    env = config.get('azure', None)
-    if env is not None:
+    env = config.get('azure', {})
+    if env is None:
+        env = {}
+    if len(env) != 0:
         env = parse_variables(env)
-    return {}
+    return env
 
 
 def is_string_dockerfile_envvar(string):
