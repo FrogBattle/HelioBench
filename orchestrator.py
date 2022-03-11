@@ -18,7 +18,7 @@ from constants import (
     AZURE_CONTAINER_REGISTRY, AZURE_CONTAINER_REGISTRY_PASSWORD, AZURE_CONTAINER_REGISTRY_REGION, AZURE_CONTAINER_REGISTRY_USERNAME, AZURE_DOCKER_ACI_CONTEXT,
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
     AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID,
-    DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
+    DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_HOSTNAME, PROMETHEUS_PORT,
     PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
 from asyncio import create_subprocess_shell, run
@@ -29,6 +29,7 @@ DEFAULT_PROMETHEUS_PORT = '9900'
 DEFAULT_PROMETHEUS_TARGET_PORT = '9090'
 DEFAULT_PROMETHEUS_HOSTNAME = 'localhost'
 DEFAULT_DEPLOYMENT_COMPOSE_FILE = 'deployment.yml'
+DEFAULT_AZURE_REGION = "ukwest"
 
 MICROSERVICES_PATH = './microservices/'
 PROMETHEUS_FOLDER = '$(pwd)/microservices/prometheus/'
@@ -235,6 +236,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     compose_filename = environment.get(DEPLOYMENT_COMPOSE_FILE, DEFAULT_DEPLOYMENT_COMPOSE_FILE)
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
     should_not_stop_prometheus = environment.get(STOP_PROMETHEUS) == "False"
+    prometheus_hostname = environment.get(PROMETHEUS_HOSTNAME)
 
     subscription_id = deployment_config.get(AZURE_SUBSCRIPTION_ID)
     container_registry = deployment_config.get(AZURE_CONTAINER_REGISTRY)
@@ -246,7 +248,9 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     aci_context = deployment_config.get(AZURE_DOCKER_ACI_CONTEXT)
     azure_container_registry_region = deployment_config.get(AZURE_CONTAINER_REGISTRY_REGION)
 
-    prometheus_hostname = f'{PROMETHEUS_SERVER_NAME}.{azure_container_registry_region}.azurecontainer.io'
+    prometheus_fqdn = (f'{prometheus_hostname if prometheus_hostname is not None else PROMETHEUS_SERVER_NAME}.'
+                       f'{azure_container_registry_region if azure_container_registry_region is not None else DEFAULT_AZURE_REGION}'
+                       f'.azurecontainer.io')
 
     print("Authenticating...")
     container_instance_client = log_into_container_instances_management(subscription_id)
@@ -254,7 +258,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     resource_group = res_client.resource_groups.get(deployment_config.get(AZURE_RESOURCE_GROUP))
 
     ensure_docker_context(subscription_id, resource_group.name, context="default", context_is_aci=False)
-    # cmd_run("docker login azure", shell=True, check=True)
+    # cmd_run("docker login azure", shell=True, check=True) # Left up to the user whenever needed.
 
     # Push Prometheus' image to registry
     prometheus_image = f"{container_registry}.azurecr.io/{PROMETHEUS_SERVER_NAME}:latest"
@@ -276,7 +280,7 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
         container_group_name=PROMETHEUS_SERVER_NAME,
         container_image_name=prometheus_image,
         ports=[int(environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT))],
-        dns_name='helio-prometheus-2'
+        dns_name=prometheus_hostname
     )
     if prometheus_ip is None:
         print("Error obtaining container IP. Is the group running?", file=sys.stderr)
@@ -312,14 +316,13 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
 
             duration = time() - experiment_start_time
             print("Experiment running:", compute_formatted_duration(duration), end='\r')
-
             finish_files = poll_storage_finish_files(storage_account_name, storage_account_key, storage_share_name)
             for finished_file in finish_files:
                 finished_service = finished_file.split('.')[0]
                 if finished_service in processes:
                     print(f"\nService {finished_service} finished at {time()}")
                     processes[finished_service]['end_time'] = time()
-                    collect_all_service_metrics(processes[finished_service], prometheus_hostname, prometheus_port)
+                    collect_all_service_metrics(processes[finished_service], prometheus_fqdn, prometheus_port)
                     finished_processes[finished_service] = processes.pop(finished_service)
 
                     collect_compose_logs(finished_service, finished_processes[finished_service]['service_path'])
