@@ -1,7 +1,4 @@
 services:
-  alexnet-inference:
-  memcached:
-  go-api:
   # alexnet:
   #   variables:
   #    - DOMAIN_NAME=alexnet2
@@ -14,7 +11,7 @@ services:
   #   variables:
   #    - DOMAIN_NAME=alexnet-inference2
   #    - PROMETHEUS_TARGET_PORT=9105
-  #    - ALEXNET_INFERENCE_DURATION=5m
+  #    - ALEXNET_INFERENCE_DURATION=20m
   #    - ALEXNET_INFERENCE_NUM_CPUS=4
   #    - ALEXNET_INFERENCE_NUM_RAM=16G
   #    - ALEXNET_INFERENCE_CPU_LIMIT=4
@@ -31,6 +28,7 @@ services:
   #   variables:
   #    - PROMETHEUS_TARGET_PORT=9102
   #    - DOMAIN_NAME=nginx-web2
+  #    - NGINX_NUMBER_OF_REQUESTS=20000000
   #    - NGINX_NUM_CPUS=1.5
   #    - NGINX_NUM_RAM=1.5G
   #    - NGINX_CPU_LIMIT=1.5
@@ -39,39 +37,42 @@ services:
   #   variables:
   #    - DOMAIN_NAME=memcached2
   #    - PROMETHEUS_TARGET_PORT=9101
-  #    - MEMCACHED_NUM_CPUS=0.5
-  #    - MEMCACHED_NUM_RAM=0.5G
-  #    - MEMCACHED_CPU_LIMIT=0.5
-  #    - MEMCACHED_RAM_LIMIT=0.5G
-  # go-api:
-  #   variables:
-  #    - PROMETHEUS_TARGET_PORT=9100
-  #    - DOMAIN_NAME=go-api2
-  #    - GO_API_WEB_PORT=80
-  #    - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
-  #    - GO_LOAD_NUM_CLIENTS=20
-  #    - GO_LOAD_RUN_TIME=5m
-  #    - GO_API_NUM_CPUS=1.5
-  #    - GO_API_NUM_RAM=1.5G
-  #    - GO_API_CPU_LIMIT=1.5
-  #    - GO_API_RAM_LIMIT=1.5G
+  #    - MEMASLAP_EXPERIMENT_DURATION=2m
+  #    - MEMCACHED_NUM_CPUS=2
+  #    - MEMCACHED_NUM_RAM=4G
+  #    - MEMCACHED_CPU_LIMIT=2
+  #    - MEMCACHED_RAM_LIMIT=4G
+  go-api:
+    variables:
+     - PROMETHEUS_TARGET_PORT=9100
+     - DOMAIN_NAME=go-api2
+     - GO_API_WEB_PORT=80
+     - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
+     - GO_LOAD_NUM_CLIENTS=500
+     - GO_LOAD_RUN_TIME=20m
+    #  - GO_API_NUM_CPUS=4
+    #  - GO_API_NUM_RAM=2G
+    #  - GO_API_CPU_LIMIT=4
+    #  - GO_API_RAM_LIMIT=2G
 
 environment:
-  # - PROMETHEUS_PORT=9090
-  # - STOP_PROMETHEUS=False
-  # - DEPLOYMENT=True
-  # - DEPLOYMENT_COMPOSE_FILE=deployment.yml
+  - PROMETHEUS_PORT=9090
+  - PROMETHEUS_HOSTNAME=helio-prometheus-2
+  - STOP_PROMETHEUS=False
+  - DEPLOYMENT=True
+  - DEPLOYMENT_COMPOSE_FILE=deployment.yml
 
 azure:
-  # - AZURE_SUBSCRIPTION_ID=cd41d856-e416-4f97-864d-bb1a3c3fcd09
-  # - AZURE_RESOURCE_GROUP=HB-Test
-  # - AZURE_CONTAINER_REGISTRY=helioregistry
-  # - AZURE_CONTAINER_REGISTRY_USERNAME=helioregistry
-  # - AZURE_CONTAINER_REGISTRY_PASSWORD=JmnxKNH7ueod3Ynw3OIj699+ayEgrcns
-  # - AZURE_STORAGE_ACCOUNT_NAME=heliostorage16848
-  # - AZURE_STORAGE_ACCOUNT_KEY=xb/g9cPUrivskQroBZr5Ft5uuBgh2n00zqDf55ggYTZq8BMGoM0YtF2/dhez2HLO/gb2hU8/evai/wfDx+TK8A==
-  # - AZURE_FILE_SHARE_NAME=heliofileshare
-  # - AZURE_DOCKER_ACI_CONTEXT=helio-aci
+  - AZURE_SUBSCRIPTION_ID=cd41d856-e416-4f97-864d-bb1a3c3fcd09
+  - AZURE_RESOURCE_GROUP=HB-Test
+  - AZURE_CONTAINER_REGISTRY=helioregistry
+  - AZURE_CONTAINER_REGISTRY_USERNAME=helioregistry
+  - AZURE_CONTAINER_REGISTRY_PASSWORD=JmnxKNH7ueod3Ynw3OIj699+ayEgrcns
+  - AZURE_STORAGE_ACCOUNT_NAME=heliostorage16848
+  - AZURE_STORAGE_ACCOUNT_KEY=xb/g9cPUrivskQroBZr5Ft5uuBgh2n00zqDf55ggYTZq8BMGoM0YtF2/dhez2HLO/gb2hU8/evai/wfDx+TK8A==
+  - AZURE_FILE_SHARE_NAME=heliofileshare
+  - AZURE_DOCKER_ACI_CONTEXT=helio-aci
+  - AZURE_CONTAINER_REGISTRY_REGION=ukwest
   # - AZURE_SUBSCRIPTION_ID=6a1c9c00-ef6b-4bbf-a3f1-ca2c019f31e9
   # - AZURE_RESOURCE_GROUP=HB-Test2
   # - AZURE_CONTAINER_REGISTRY=helioregistry2
@@ -82,4 +83,3 @@ azure:
   # - AZURE_STORAGE_ACCOUNT_KEY=vNARNpCuIAspVwxzfqzijF6O3VCPNLb3Y0ADbCV1l3PyTBTGcT7SRm55wk37oQptkjn9WXYqJuqwozPlbOdQlA==
   # - AZURE_FILE_SHARE_NAME=heliofileshare2
   # - AZURE_DOCKER_ACI_CONTEXT=helio-aci2
-  # - AZURE_TENANT_ID=e02b355e-2ed1-4963-84b7-40d44a68842e

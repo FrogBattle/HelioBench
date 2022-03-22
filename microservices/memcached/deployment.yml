@@ -28,7 +28,7 @@ services:
     environment:
       - SERVERS=memcached:11211
       - STAT_FREQ=10s
-      - TIME=5m
+      - TIME=${MEMASLAP_EXPERIMENT_DURATION}
       - EXPERIMENT_WORKLOAD=${EXPERIMENT_WORKLOAD}
     volumes:
       - heliobench:/home/experiment

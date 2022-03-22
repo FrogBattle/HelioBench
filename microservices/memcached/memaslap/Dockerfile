@@ -10,6 +10,7 @@ RUN cd libmemcached-1.0.18 && ./configure --enable-memaslap
 RUN cd libmemcached-1.0.18 && sudo make && sudo make install
 
 COPY entrypoint.sh .
+COPY ./.memaslap.cnf .
 RUN chmod +x ./entrypoint.sh
 
 CMD [ "./entrypoint.sh" ]

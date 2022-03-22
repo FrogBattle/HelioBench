@@ -181,7 +181,7 @@ def poll_storage_finish_files(storage_account_name, storage_account_key, share_n
     return current_filenames
 
 
-def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True, tenant_id=None):
+def ensure_docker_context(subscription_id, resource_group, context="default", context_is_aci=True):
     try:
         cmd_run(f"docker context use {context}", check=True, shell=True, capture_output=True)
     except CalledProcessError as err:
@@ -276,7 +276,7 @@ class AzureContainerInstanceFactory:
 
         return containers, group_ports
 
-    def deploy_single_container(self, container_group_name, container_image_name, ports, done_callback=lambda _: None):
+    def deploy_single_container(self, container_group_name, container_image_name, ports, dns_name=None):
         print(f"Deploying {container_group_name}...")
 
         container_instance_client = self.container_instance_client
@@ -294,7 +294,7 @@ class AzureContainerInstanceFactory:
 
         # Configure the container group
         ports = [Port(protocol=ContainerGroupNetworkProtocol.tcp, port=port) for port in ports]
-        group_ip_address = IpAddress(ports=ports, dns_name_label=container_group_name,
+        group_ip_address = IpAddress(ports=ports, dns_name_label=container_group_name if dns_name is None else dns_name,
                                      type=ContainerGroupIpAddressType.PUBLIC)
 
         group = ContainerGroup(location=resource_group.location,

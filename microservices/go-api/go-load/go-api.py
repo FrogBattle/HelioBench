@@ -7,8 +7,9 @@ import uuid
 from locust import HttpUser, task, between
 from random import choice
 
+
 class UserBehavior(HttpUser):
-    wait_time = between(2, 10)
+    wait_time = between(2, 5)
 
     # source: https://tools.tracemyip.org/search--ip/list
     fake_ip_addresses = [
@@ -32,14 +33,11 @@ class UserBehavior(HttpUser):
         """ on_start is called when a Locust start before any task is scheduled """
         print('Starting')
 
-
     @task
     def healthcheck(self):
         fake_ip = random.choice(self.fake_ip_addresses)
 
         self.client.get('/', headers={'x-forwarded-for': fake_ip})
-
-
 
     @task
     def read_articles(self):
@@ -56,8 +54,7 @@ class UserBehavior(HttpUser):
         fake_ip = random.choice(self.fake_ip_addresses)
 
         article_to_write = choice(ALL_ARTICLES)
-        self.client.post('/article', json={**article_to_write, "Id":str(uuid.uuid4())}, headers={'x-forwarded-for': fake_ip})
-
+        self.client.post('/article', json={**article_to_write, "Id": str(uuid.uuid4())}, headers={'x-forwarded-for': fake_ip})
 
     @task
     def delete_article(self):
