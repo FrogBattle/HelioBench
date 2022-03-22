@@ -19,14 +19,15 @@ from constants import (
     AZURE_FILE_SHARE_NAME, AZURE_RESOURCE_GROUP, AZURE_STORAGE_ACCOUNT_KEY,
     AZURE_STORAGE_ACCOUNT_NAME, AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID,
     DEPLOYMENT, DEPLOYMENT_COMPOSE_FILE, DOMAIN_NAME, EXPERIMENT_WORKLOAD, PROMETHEUS_PORT,
-    PROMETHEUS_TARGET_PORT, STOP_PROMETHEUS)
+    PROMETHEUS_TARGET_PORT, PROMETHEUS_URL, STOP_PROMETHEUS)
 from data_collector import MetricCollectionError, collect_metrics
-from asyncio import create_subprocess_shell, run
+from asyncio import create_subprocess_shell, run, wait_for
 from asyncio.subprocess import DEVNULL, PIPE
+from asyncio.exceptions import TimeoutError
 from subprocess import CalledProcessError, run as cmd_run
 
-DEFAULT_PROMETHEUS_PORT = '9900'
-DEFAULT_PROMETHEUS_TARGET_PORT = '9090'
+DEFAULT_PROMETHEUS_PORT = '9090'
+DEFAULT_PROMETHEUS_TARGET_PORT = '9000'
 DEFAULT_PROMETHEUS_HOSTNAME = 'localhost'
 DEFAULT_DEPLOYMENT_COMPOSE_FILE = 'deployment.yml'
 
@@ -108,21 +109,27 @@ async def collect_logs(service, process):
     stderr_filename = f'{service_dir}log.error'
 
     if process.stdout:
-        with open(stdout_filename, 'wb+') as file:
+        with open(stdout_filename, 'wb') as file:
             line = await process.stdout.readline()
-            while not process.stdout.at_eof() and len(line) != 0:
-                file.write(line)
-                line = await process.stdout.readline()
+            try:
+                while not process.stdout.at_eof() and line != b'' and len(line) != 0:
+                    file.write(line)
+                    line = await wait_for(process.stdout.readline(), 1.0)
+            except TimeoutError:
+                file.write(b'\nHelioBench: Timed out waiting for process stdout.\n')
 
     if process.stderr:
-        with open(stderr_filename, 'wb+') as file:
-            while not process.stderr.at_eof():
-                stderr_data_line = await process.stderr.readline()
-                file.write(stderr_data_line)
+        with open(stderr_filename, 'wb') as file:
+            line = await process.stderr.readline()
+            try:
+                while not process.stderr.at_eof() and line != b'' and len(line) != 0:
+                    file.write(line)
+                    line = await wait_for(process.stderr.readline(), 1.0)
+            except TimeoutError:
+                file.write(b'\nHelioBench: Timed out waiting for process stderr.\n')
 
 
 def run_prometheus_server():
-    print("Starting Prometheus server...")
     cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=DEVNULL, stderr=DEVNULL)
     cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=DEVNULL, stderr=DEVNULL)
 
@@ -179,8 +186,12 @@ def compute_formatted_duration(duration_in_seconds):
 
 
 async def orchestrate(services, environment, service_envvars):
-    experiment_start_time = time()
+    run_prometheus_server()
     prometheus_port = environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT)
+    prometheus_url = environment.get(PROMETHEUS_URL, DEFAULT_PROMETHEUS_HOSTNAME)
+    print(f"Started Prometheus server at http://www.{prometheus_url}:{prometheus_port}")
+
+    experiment_start_time = time()
     should_not_stop_prometheus = environment.get(STOP_PROMETHEUS) == "False"
 
     try:
@@ -206,7 +217,7 @@ async def orchestrate(services, environment, service_envvars):
                     if finished_service_name in processes:
                         print(f"Service {finished_service_name} finished")
                         processes[finished_service_name]['end_time'] = time()
-                        collect_all_service_metrics(processes[finished_service_name], DEFAULT_PROMETHEUS_HOSTNAME, prometheus_port)
+                        collect_all_service_metrics(processes[finished_service_name], prometheus_url, prometheus_port)
                         processes[finished_service_name]['process'].terminate()
                         completed_processes[finished_service_name] = processes.pop(finished_service_name)
 
@@ -279,7 +290,10 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
         ports=[int(environment.get(PROMETHEUS_PORT, DEFAULT_PROMETHEUS_PORT))],
     )
     if prometheus_ip is None:
-        print("Error obtaining container IP. Is the group running?", file=sys.stderr)
+        print("Error obtaining container IP. Is the group already running in Azure?", file=sys.stderr)
+        print(f"Started Prometheus server at http://www.{prometheus_hostname}:{prometheus_port}")
+    else:
+        print(f"Started Prometheus server at http://www.{prometheus_hostname}:{prometheus_port}. IP: {prometheus_ip}.")
 
     delete_storage_finish_files(
         storage_account_name, storage_account_key, storage_share_name, services)
@@ -370,8 +384,8 @@ async def main():
             print("Deployment command failed. Error: ", err)
             return
     else:
+        ensure_docker_context('', '', 'default')
         prepare_prometheus_configuration(service_envvars, is_deployment, None)
-        run_prometheus_server()
         print(run_auxiliary_script('remove_finished_volumes.py', ' '.join(services), True).stdout)
         await orchestrate(services, environment, service_envvars)
 

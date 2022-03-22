@@ -7,7 +7,7 @@ Before running the project, you need to make sure that you have created a virtua
 1. Make sure you have at least **Python 3.9** installed. 
 2. Create a virtual environment using `python3 -m venv ./venv` at the project root. 
 3. Install all project requirements by running `pip3 install -r requirements.txt` from the project root directory.
-4. Activate the vritual environment running `source ./venv/bin/activate` for UNIX users or `venv\Scripts\activate.bat` for Windows users.
+4. Activate the virtual environment running `source ./venv/bin/activate` for UNIX users or `venv\Scripts\activate.bat` for Windows users.
 
 ### Running local 
 The main configuration file HelioBench uses is `experiment.yml`. In order to run local experiments, make sure that `DEPLOYMENT=False` is set or the variable is commented out.
