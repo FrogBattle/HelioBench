@@ -41,13 +41,7 @@ else
     unset TIME
 fi
 
-echo "Starting $CLIENTS clients for ${GO_LOAD_RUN_TIME:-ever}"
-if [ "$SILENT" -eq 1 ]
-then
-    locust -f go-api.py --host "$GO_LOAD_TARGET_HOST" --headless -r 1 -u $GO_LOAD_NUM_CLIENTS $TIME > /dev/null 2>&1
-else
-    locust -f go-api.py --host "$GO_LOAD_TARGET_HOST" --headless -r 1 -u $GO_LOAD_NUM_CLIENTS $TIME
-fi
+locust -f go-api.py --host "$GO_LOAD_TARGET_HOST" --headless --only-summary -r 25 -u $GO_LOAD_NUM_CLIENTS $TIME 
 
 ### HelioBench: Indicate experiment finish
 touch /home/experiment/$EXPERIMENT_WORKLOAD.finish
