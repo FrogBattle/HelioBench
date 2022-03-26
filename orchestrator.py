@@ -295,9 +295,9 @@ def orchestrate_deployment(deployment_config, services, service_envvars, environ
     )
     if prometheus_ip is None:
         print("Error obtaining container IP. Is the group already running in Azure?", file=sys.stderr)
-        print(f"Started Prometheus server at http://www.{prometheus_hostname}:{prometheus_port}")
+        print(f"Started Prometheus server at http://www.{prometheus_fqdn}:{prometheus_port}")
     else:
-        print(f"Started Prometheus server at http://www.{prometheus_hostname}:{prometheus_port}. IP: {prometheus_ip}.")
+        print(f"Started Prometheus server at http://www.{prometheus_fqdn}:{prometheus_port}. IP: {prometheus_ip}.")
 
     delete_storage_finish_files(
         storage_account_name, storage_account_key, storage_share_name, services)
