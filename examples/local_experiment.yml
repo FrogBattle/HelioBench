@@ -1,0 +1,11 @@
+services:
+  alexnet-inference:
+    variables:
+     - DOMAIN_NAME=alexnet-inference2
+     - PROMETHEUS_TARGET_PORT=9105
+     - ALEXNET_INFERENCE_DURATION=10m
+
+environment:
+  - PROMETHEUS_PORT=9090
+  - STOP_PROMETHEUS=True
+  - DEPLOYMENT=False

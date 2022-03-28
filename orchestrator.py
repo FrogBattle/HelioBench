@@ -11,7 +11,7 @@ from deployment import (
     delete_storage_finish_files, deploy_docker_compose, ensure_docker_context,
     log_into_container_instances_management, log_into_resource_management, poll_storage_finish_files, stop_compose_process)
 from config_parser import (
-    PROMETHEUS_CONFIG_FILE_PATH, parse_and_validate_config,
+    parse_and_validate_config,
     parse_azure, parse_config, parse_environment,
     parse_service_envvars, save_config, substitute_nested_envvar_strings)
 from constants import (
@@ -29,6 +29,7 @@ from subprocess import CalledProcessError, run as cmd_run
 DEFAULT_PROMETHEUS_PORT = '9090'
 DEFAULT_PROMETHEUS_TARGET_PORT = '9000'
 DEFAULT_PROMETHEUS_HOSTNAME = 'localhost'
+DEFAULT_PROMETHEUS_CONFIG_PATH = "./microservices/prometheus/prometheus.yml"
 DEFAULT_DEPLOYMENT_COMPOSE_FILE = 'deployment.yml'
 DEFAULT_AZURE_REGION = "ukwest"
 
@@ -41,9 +42,9 @@ RESULTS_FOLDER = './results/'
 
 CONTAINER_SCRIPTS_FOLDER = '/home/scripts/'
 DOCKER_COMPOSE_COMMAND = 'docker-compose up --build'
-
 DOCKER_VOLUME_NAME = 'HelioBench'
 
+# All Prometheus queries to evaluate and store data for
 QUERY_MAPPING = {
     'CPU_USER_PRC': "avg by (instance) (irate(node_cpu_seconds_total{mode='user'}[1m])) * 100",
     'CPU_SYS_PRC':  "avg by (instance) (irate(node_cpu_seconds_total{mode='system'}[1m])) * 100",
@@ -131,8 +132,8 @@ async def collect_logs(service, process):
 
 
 def run_prometheus_server():
-    cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=DEVNULL, stderr=DEVNULL)
-    cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=DEVNULL, stderr=DEVNULL)
+    cmd_run(f'docker build -t {PROMETHEUS_SERVER_NAME}:latest {PROMETHEUS_FOLDER}', shell=True, stdout=DEVNULL, stderr=DEVNULL, check=True)
+    cmd_run(f'{PROMETHEUS_FOLDER}run_container.sh', shell=True, stdout=DEVNULL, stderr=DEVNULL, check=True)
 
 
 def stop_prometheus_server():
@@ -143,13 +144,13 @@ def stop_prometheus_server():
 
 def prepare_prometheus_configuration(service_envvars, is_deployment, cr_region):
     print("Preparing Prometheus server configuration...")
-    prom_config = parse_config(PROMETHEUS_CONFIG_FILE_PATH)
+    prom_config = parse_config(DEFAULT_PROMETHEUS_CONFIG_PATH)
 
     prom_config['scrape_configs'][0]['static_configs'][0]['targets'] = [
         f'{service_name if not is_deployment else f"{service_envvars.get(DOMAIN_NAME, service_name)}.{cr_region}.azurecontainer.io"}'
         f':{service_envvars.get(PROMETHEUS_TARGET_PORT, DEFAULT_PROMETHEUS_TARGET_PORT )}'
         for service_name, service_envvars in service_envvars.items() if service_envvars is not None]
-    save_config(PROMETHEUS_CONFIG_FILE_PATH, prom_config)
+    save_config(DEFAULT_PROMETHEUS_CONFIG_PATH, prom_config)
 
 
 def export_envvars(vars_dict, env=environ.copy()):
@@ -230,11 +231,17 @@ async def orchestrate(services, environment, service_envvars):
 
     except KeyboardInterrupt:
         print("\nExperiment cancelled")
+        if processes is not None and len(processes) > 0:
+            for service_details in processes.values():
+                if service_details is not None and service_details['process'] is not None:
+                    service_details['process'].terminate()
     except (JSONDecodeError, TypeError, MetricCollectionError) as e:
         print(e)
         print("Error polling files for data...Killing processes")
-        for service_details in processes.values():
-            service_details['process'].terminate()
+        if processes is not None and len(processes) > 0:
+            for service_details in processes.values():
+                if service_details is not None and service_details['process'] is not None:
+                    service_details['process'].terminate()
     finally:
         print("Collecting logs for processes...")
         for service_details in [*processes.values(), *completed_processes.values()]:

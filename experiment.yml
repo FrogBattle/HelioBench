@@ -4,18 +4,18 @@ services:
   #    - DOMAIN_NAME=alexnet2
   #    - PROMETHEUS_TARGET_PORT=9104
   #    - ALEXNET_NUM_CPUS=4
-  #    - ALEXNET_NUM_RAM=16G
+  #    - ALEXNET_NUM_RAM=4G
   #    - ALEXNET_CPU_LIMIT=4
-  #    - ALEXNET_RAM_LIMIT=16G
-  # alexnet-inference:
-  #   variables:
-  #    - DOMAIN_NAME=alexnet-inference2
-  #    - PROMETHEUS_TARGET_PORT=9105
-  #    - ALEXNET_INFERENCE_DURATION=20m
-  #    - ALEXNET_INFERENCE_NUM_CPUS=4
-  #    - ALEXNET_INFERENCE_NUM_RAM=16G
-  #    - ALEXNET_INFERENCE_CPU_LIMIT=4
-  #    - ALEXNET_INFERENCE_RAM_LIMIT=16G
+  #    - ALEXNET_RAM_LIMIT=4G
+  alexnet-inference:
+    variables:
+     - DOMAIN_NAME=alexnet-inference2
+     - PROMETHEUS_TARGET_PORT=9105
+     - ALEXNET_INFERENCE_DURATION=5m
+     - ALEXNET_INFERENCE_NUM_CPUS=4
+     - ALEXNET_INFERENCE_NUM_RAM=16G
+     - ALEXNET_INFERENCE_CPU_LIMIT=4
+     - ALEXNET_INFERENCE_RAM_LIMIT=16G
   # text-analysis:
   #   variables:
   #    - DOMAIN_NAME=text-analysis2
@@ -42,24 +42,24 @@ services:
   #    - MEMCACHED_NUM_RAM=4G
   #    - MEMCACHED_CPU_LIMIT=2
   #    - MEMCACHED_RAM_LIMIT=4G
-  go-api:
-    variables:
-     - PROMETHEUS_TARGET_PORT=9100
-     - DOMAIN_NAME=go-api2
-     - GO_API_WEB_PORT=80
-     - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
-     - GO_LOAD_NUM_CLIENTS=500
-     - GO_LOAD_RUN_TIME=20m
-    #  - GO_API_NUM_CPUS=4
-    #  - GO_API_NUM_RAM=2G
-    #  - GO_API_CPU_LIMIT=4
-    #  - GO_API_RAM_LIMIT=2G
+  # go-api:
+  #   variables:
+  #    - PROMETHEUS_TARGET_PORT=9100
+  #    - DOMAIN_NAME=go-api2
+  #    - GO_API_WEB_PORT=80
+  #    - GO_LOAD_TARGET_HOST=http://go-api:${GO_API_WEB_PORT}
+  #    - GO_LOAD_NUM_CLIENTS=500
+  #    - GO_LOAD_RUN_TIME=10m
+  #    - GO_API_NUM_CPUS=4
+  #    - GO_API_NUM_RAM=2G
+  #    - GO_API_CPU_LIMIT=4
+  #    - GO_API_RAM_LIMIT=2G
 
 environment:
   - PROMETHEUS_PORT=9090
   - PROMETHEUS_HOSTNAME=helio-prometheus-2
   - STOP_PROMETHEUS=False
-  - DEPLOYMENT=True
+  - DEPLOYMENT=False
   - DEPLOYMENT_COMPOSE_FILE=deployment.yml
 
 azure:
@@ -73,13 +73,3 @@ azure:
   - AZURE_FILE_SHARE_NAME=heliofileshare
   - AZURE_DOCKER_ACI_CONTEXT=helio-aci
   - AZURE_CONTAINER_REGISTRY_REGION=ukwest
-  # - AZURE_SUBSCRIPTION_ID=6a1c9c00-ef6b-4bbf-a3f1-ca2c019f31e9
-  # - AZURE_RESOURCE_GROUP=HB-Test2
-  # - AZURE_CONTAINER_REGISTRY=helioregistry2
-  # - AZURE_CONTAINER_REGISTRY_REGION=ukwest
-  # - AZURE_CONTAINER_REGISTRY_USERNAME=helioregistry2
-  # - AZURE_CONTAINER_REGISTRY_PASSWORD=RxgdW7KVuW5MxklfPrmtj9+hwIykEzC2
-  # - AZURE_STORAGE_ACCOUNT_NAME=heliostorage12497
-  # - AZURE_STORAGE_ACCOUNT_KEY=vNARNpCuIAspVwxzfqzijF6O3VCPNLb3Y0ADbCV1l3PyTBTGcT7SRm55wk37oQptkjn9WXYqJuqwozPlbOdQlA==
-  # - AZURE_FILE_SHARE_NAME=heliofileshare2
-  # - AZURE_DOCKER_ACI_CONTEXT=helio-aci2

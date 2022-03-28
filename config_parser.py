@@ -2,7 +2,6 @@ import re
 import yaml
 
 EXPERIMENT_CONFIG_FILE_PATH = "./experiment.yml"
-PROMETHEUS_CONFIG_FILE_PATH = "./microservices/prometheus/prometheus.yml"
 
 
 class ConfigError(Exception):
