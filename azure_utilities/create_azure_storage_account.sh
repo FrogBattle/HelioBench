@@ -1,5 +1,5 @@
 #!/bin/bash
-# Src: https://docs.microsoft.com/en-us/azure/container-instances/container-instances-volume-azure-files
+# Reference: https://docs.microsoft.com/en-us/azure/container-instances/container-instances-volume-azure-files
 # WARNING: Make sure you are logged into the correct directory.
 
 # Change these four parameters as needed

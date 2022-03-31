@@ -1,5 +1,5 @@
 #!/bin/bash
-# Src: https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-azure-cli
+# Reference: https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-azure-cli
 # WARNING: Make sure you are logged into the correct directory.
 
 # Change these four parameters as needed

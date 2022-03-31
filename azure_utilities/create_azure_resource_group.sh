@@ -1,5 +1,5 @@
 #!/bin/bash
-# Src: https://docs.microsoft.com/en-us/cli/azure/group?view=azure-cli-latest
+# Reference: https://docs.microsoft.com/en-us/cli/azure/group?view=azure-cli-latest
 # WARNING: Make sure you are logged into the correct directory.
 
 # Change these four parameters as needed
