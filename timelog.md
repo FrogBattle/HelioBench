@@ -12,7 +12,69 @@
 * This timelog should be filled out honestly, regularly (daily) and accurately. It is for *your* benefit.
 * Follow the structure provided, grouping time by weeks.  Quantise time to the half hour.
 
+## Week 25
+
+### 01 Apr 2022
+* *4.0 hours* Finish presentation and video recording.
+* *0.5 hour* Catch up on writing the timelog.
+* *2.0 hours* Gather all data for submission and submit.
+
+### 31 Mar 2022
+* *4.0 hours* Create presentation and start testing video recording.
+* *2.0 hours* Review marking sheet and submission instructions.
+
+### 30 Mar 2022
+* *5.0 hours* Last edits of dissertation - fixing headings, references, and more.
+* *2.0 hours* Finishing touches and polish of code.
+* *2.0 hours* Plan out presentation
+
+### 29 Mar 2022
+* *6.0 hours* Read a peer's dissertation and give feedeback.
+* *3.0 hours* Implement peer dissertation feedback.
+
+### 28 Mar 2022
+* *4.5 hours* Implement introduction and conclusion feedback.
+* *3.0 hours* Finish evaluation, taking into account feedback.
+
+### 25 Mar 2022
+* *2.5 hours* Implement background work feedback.
+
+### 24 Mar 2022
+* *2.0 hours* Implement conclusion structure and high-level content plan.
+* *3.0 hours* Progress Requirements and Limitations conclusion subsections.
+* *1.0 hour* Prepare and sit last supervisor meeting.
+
+## Week 24
+
+### 18 Mar 2022
+* *1.5 hours* Finish background section and references.
+* *2.0 hours* Progress the evaluation chapter. Fix issues of bad experiment data and repeat memcached experiment.
+* *1.0 hour* Prepare for and sit supervisor meeting.
+* *0.5 hour* Prepare and send out evaluation strategy to Yehia.
+
+## Week 23
+
+### 11 Mar 2022
+* *2.5 hours* Research and implement the background section. Add references.
+
+### 10 Mar 2022
+* *3.5 hours* Progress evaluation chapter. Start the case study.
+* *1.0 hour* Prepare and sit regular supervisor meeting.
+* *4.0 hours* Progress evaluation chapter. Progress Case study.
+
 ## Week 22
+
+### 09 Mar 2022
+* *2.5 hours* Progress evaluation chapter. Improve overview and overall approach.
+* *3.5 hours* Progress evaluation chapter. High-level contnet plan - case study, walkthrough.
+
+### 08 Mar 2022
+* *2.0 hours* Refactor Design per supervisor feedback.
+* *2.0 hours* Refactor Implementation per supervisor feedback.
+* *1.5 hours* Progress evaluation chapter. Include overview and overall approach
+
+### 07 Mar 2022
+* *1.0 hour* Refactor Introduction per supervisor feedback.
 
 ### 03 Mar 2022
 * *2.0 hours* Finish Implementation section.
